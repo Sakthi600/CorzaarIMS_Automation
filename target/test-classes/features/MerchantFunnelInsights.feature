@@ -1,6 +1,6 @@
 Feature: Funnel Insights
 
-  @merchant @funnelinsights
+  @merchant @funnelinsights @positive
   Scenario: Verify Learner Retention and Funnel Insights
     When user opens Funnel Insights
     Then Funnel Insights page should be displayed

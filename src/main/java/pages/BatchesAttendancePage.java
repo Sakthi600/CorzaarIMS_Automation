@@ -3,125 +3,127 @@ package pages;
 import java.time.Duration;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import utils.ElementUtils;
 
 public class BatchesAttendancePage {
 
 	private WebDriver driver;
-	private WebDriverWait wait;
+
+	private ElementUtils elementUtils;
 
 	public BatchesAttendancePage(WebDriver driver) {
 
 		this.driver = driver;
 
-		this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+		this.elementUtils = new ElementUtils(driver);
+
+		PageFactory.initElements(driver, this);
 	}
 
-	private By batchesAttendanceMenu = By.xpath("//span[text()='Batches & Attendance']");
+	@FindBy(xpath = "//span[text()='Batches & Attendance']")
+	private WebElement batchesAttendanceMenu;
 
-	private By createCohortBatchButton = By.xpath("//span[normalize-space()='Create Cohort Batch']");
+	@FindBy(xpath = "//span[normalize-space()='Create Cohort Batch']")
+	private WebElement createCohortBatchButton;
 
-	private By selectCourseDropdown = By.xpath("//select[@id='select-course']");
+	@FindBy(xpath = "//select[@id='select-course']")
+	private WebElement selectCourseDropdown;
 
-	private By coordinator = By.xpath("(//input[@id='course-coordinator-/-instructor'])[1]");
+	@FindBy(xpath = "(//input[@id='course-coordinator-/-instructor'])[1]")
+	private WebElement coordinator;
 
-	private By weeklyScheduleDropdown = By.xpath("//input[@id='weekly-schedule-(days)']");
+	@FindBy(xpath = "//input[@id='weekly-schedule-(days)']")
+	private WebElement weeklySchedule;
 
-	private By startDate = By.xpath("//input[@id='start-date']");
+	@FindBy(xpath = "//input[@id='start-date']")
+	private WebElement startDate;
 
-	private By endDate = By.xpath("//input[@id='end-date']");
+	@FindBy(xpath = "//input[@id='end-date']")
+	private WebElement endDate;
 
-	private By seatCapacity = By.xpath("//input[@id='cohort-seat-capacity']");
+	@FindBy(xpath = "//input[@id='cohort-seat-capacity']")
+	private WebElement seatCapacity;
 
-	private By generateSessionsButton = By.xpath("//span[text()='Generate Sessions & Schedule']");
+	@FindBy(xpath = "//span[text()='Generate Sessions & Schedule']")
+	private WebElement generateSessionsButton;
+
+	@FindBy(xpath = "(//span[normalize-space()='Cancel'])[1]")
+	private WebElement cancelButton;
 
 	public void openBatchesAttendance() {
 
-		wait.until(ExpectedConditions.elementToBeClickable(batchesAttendanceMenu)).click();
+		elementUtils.click(batchesAttendanceMenu);
 	}
 
 	public void clickCreateCohortBatch() {
 
-		wait.until(ExpectedConditions.elementToBeClickable(createCohortBatchButton)).click();
+		elementUtils.click(createCohortBatchButton);
 	}
 
 	public void selectCourse(String courseName) {
 
-		// Open Course dropdown
-		WebElement dropdown = wait.until(ExpectedConditions.elementToBeClickable(selectCourseDropdown));
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
-		dropdown.click();
+		wait.until(ExpectedConditions.elementToBeClickable(selectCourseDropdown)).click();
 
-		// Wait for the course text displayed in the opened dropdown
-		By courseOption = By.xpath("//option[@value='06413bea-c85c-43e0-ae5f-5bca7160e559']");
+		WebElement courseOption = wait.until(ExpectedConditions
+				.elementToBeClickable(By.xpath("//option[@value='f8ff4b74-86a6-49f7-a731-61e9c654863d']")));
 
-		WebElement option = wait.until(ExpectedConditions.elementToBeClickable(courseOption));
-		option.click();
-
+		courseOption.click();
 	}
 
 	public void enterCoordinator(String name) {
 
-		WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(coordinator));
-
-		element.clear();
-		element.sendKeys(name);
+		elementUtils.clear(coordinator);
+		elementUtils.fillValue(coordinator, name);
 	}
 
-	public void selectWeeklySchedule(String day) {
+	public void enterWeeklySchedule(String days) {
 
-		WebElement element = wait.until(ExpectedConditions.elementToBeClickable(weeklyScheduleDropdown));
-
-		element.clear();
-		element.sendKeys(day);
-
+		elementUtils.clear(weeklySchedule);
+		elementUtils.fillValue(weeklySchedule, days);
 	}
 
 	public void enterStartDate(String date) {
 
-		WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(startDate));
-
-		element.clear();
-		element.sendKeys(date);
+		elementUtils.clear(startDate);
+		elementUtils.fillValue(startDate, date);
 	}
 
 	public void enterEndDate(String date) {
 
-		WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(endDate));
-
-		element.clear();
-		element.sendKeys(date);
+		elementUtils.clear(endDate);
+		elementUtils.fillValue(endDate, date);
 	}
 
 	public void enterSeatCapacity(String capacity) {
 
-		WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(seatCapacity));
-
-		element.clear();
-		element.sendKeys(capacity);
+		elementUtils.clear(seatCapacity);
+		elementUtils.fillValue(seatCapacity, capacity);
 	}
 
 	public void generateSessions() {
 
-		wait.until(ExpectedConditions.elementToBeClickable(generateSessionsButton)).click();
+		elementUtils.click(generateSessionsButton);
 	}
+
+	public void clickCancel() {
+		elementUtils.click(cancelButton);
+	}
+
+	@FindBy(xpath = "//*[contains(normalize-space(),'Scheduled')]" + " | //*[contains(normalize-space(),'Cohort')]"
+			+ " | //*[contains(normalize-space(),'Mon')]")
+	private WebElement batchResult;
 
 	public boolean isBatchCreated() {
 
-		By batchResult = By.xpath("//*[contains(normalize-space(),'Scheduled')]"
-				+ " | //*[contains(normalize-space(),'Cohort')]" + " | //*[contains(normalize-space(),'Mon')]");
-
-		try {
-
-			return wait.until(ExpectedConditions.visibilityOfElementLocated(batchResult)).isDisplayed();
-
-		} catch (Exception e) {
-
-			return false;
-		}
+		return elementUtils.isDisplayed(batchResult);
 	}
 }

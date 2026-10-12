@@ -1,76 +1,76 @@
 package pages;
 
-import java.time.Duration;
-
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+
+import utils.ElementUtils;
 
 public class FunnelInsightsPage {
 
 	private WebDriver driver;
-	private WebDriverWait wait;
+	private ElementUtils elementUtils;
 
 	public FunnelInsightsPage(WebDriver driver) {
 		this.driver = driver;
-		this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+		this.elementUtils = new ElementUtils(driver);
+		PageFactory.initElements(driver, this);
 	}
 
-	private By funnelInsightsMenu = By.xpath("//span[normalize-space()='Funnel Insights']");
+	@FindBy(xpath = "//span[normalize-space()='Funnel Insights']")
+	private WebElement funnelInsightsMenu;
 
-	private By pageTitle = By.xpath("//h1[normalize-space()='Learner Retention & Funnel Insights']");
+	@FindBy(xpath = "//h1[normalize-space()='Learner Retention & Funnel Insights']")
+	private WebElement pageTitle;
 
-	private By topPerformingPrograms = By.xpath("//h2[normalize-space()='Top Performing Programs']");
+	@FindBy(xpath = "//h2[normalize-space()='Top Performing Programs']")
+	private WebElement topPerformingPrograms;
 
-	private By rankOne = By.xpath("//span[normalize-space()='Rank #1']");
+	@FindBy(xpath = "//span[normalize-space()='Rank #1']")
+	private WebElement rankOne;
 
-	private By rankTwo = By.xpath("//span[normalize-space()='Rank #2']");
+	@FindBy(xpath = "//span[normalize-space()='Rank #2']")
+	private WebElement rankTwo;
 
-	private By seleniumAutomationTesting = By.xpath("(//h3[text()='Selenium Automation Testing'])[1]");
+	@FindBy(xpath = "(//h3[text()='Selenium Automation Testing'])[1]")
+	private WebElement seleniumAutomationTesting;
 
-	private By curriculumCompletion = By.xpath("//*[normalize-space()='Curriculum Completion & Drop-Off Matrix']");
+	@FindBy(xpath = "//*[normalize-space()='Curriculum Completion & Drop-Off Matrix']")
+	private WebElement curriculumCompletion;
 
-	private By noDropOffData = By.xpath(
-			"(//div[@class='p-8 text-center bg-white dark:bg-dark-surface rounded-2xl border border-border text-ink-muted'])[1]");
+	@FindBy(xpath = "(//div[@class='p-8 text-center bg-white dark:bg-dark-surface rounded-2xl border border-border text-ink-muted'])[1]")
+	private WebElement noDropOffData;
 
 	public void openFunnelInsights() {
-
-		wait.until(ExpectedConditions.elementToBeClickable(funnelInsightsMenu)).click();
+		elementUtils.click(funnelInsightsMenu);
 	}
 
 	public boolean isFunnelInsightsPageDisplayed() {
-
-		return wait.until(ExpectedConditions.visibilityOfElementLocated(pageTitle)).isDisplayed();
+		return elementUtils.isDisplayed(pageTitle);
 	}
 
 	public boolean isTopPerformingProgramsDisplayed() {
-
-		return wait.until(ExpectedConditions.visibilityOfElementLocated(topPerformingPrograms)).isDisplayed();
+		return elementUtils.isDisplayed(topPerformingPrograms);
 	}
 
 	public boolean isRankOneDisplayed() {
-
-		return wait.until(ExpectedConditions.visibilityOfElementLocated(rankOne)).isDisplayed();
+		return elementUtils.isDisplayed(rankOne);
 	}
 
 	public boolean isRankTwoDisplayed() {
-
-		return wait.until(ExpectedConditions.visibilityOfElementLocated(rankTwo)).isDisplayed();
+		return elementUtils.isDisplayed(rankTwo);
 	}
 
 	public boolean isSeleniumAutomationTestingDisplayed() {
-
-		return wait.until(ExpectedConditions.visibilityOfElementLocated(seleniumAutomationTesting)).isDisplayed();
+		return elementUtils.isDisplayed(seleniumAutomationTesting);
 	}
 
 	public boolean isCurriculumCompletionDisplayed() {
-
-		return wait.until(ExpectedConditions.visibilityOfElementLocated(curriculumCompletion)).isDisplayed();
+		return elementUtils.isDisplayed(curriculumCompletion);
 	}
 
 	public boolean isNoDropOffDataDisplayed() {
-
-		return wait.until(ExpectedConditions.visibilityOfElementLocated(noDropOffData)).isDisplayed();
+		return elementUtils.isDisplayed(noDropOffData);
 	}
 }

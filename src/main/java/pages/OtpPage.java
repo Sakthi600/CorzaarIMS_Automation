@@ -2,78 +2,67 @@ package pages;
 
 import java.time.Duration;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.ElementClickInterceptedException;
+import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import utils.ElementUtils;
 
 public class OtpPage {
 
 	private WebDriver driver;
-	private WebDriverWait wait;
+	private ElementUtils elementUtils;
 
 	public OtpPage(WebDriver driver) {
 
 		this.driver = driver;
 
-		wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+		this.elementUtils = new ElementUtils(driver);
+
+		PageFactory.initElements(driver, this);
 	}
 
-	private By otpField = By.xpath("//input[@id='enter-6-digit-passcode']");
+	@FindBy(xpath = "(//input[@id='enter-6-digit-passcode'])[1]")
+	private WebElement otpField;
 
-	private By verifyButton = By.xpath("(//button[@type='submit'])[1]");
+	@FindBy(xpath = "//span[text()='Verify & Enter Merchant Studio']")
+	private WebElement verifyButtonElement;
 
-	private By otpVerificationTitle = By.xpath("(//label[@for='enter-6-digit-passcode'])[1]");
-
-	public boolean isOtpVerificationPageDisplayed() {
-
-		try {
-
-			WebElement otpTitle = wait.until(ExpectedConditions.visibilityOfElementLocated(otpVerificationTitle));
-
-			return otpTitle.isDisplayed();
-
-		} catch (Exception e) {
-
-			return false;
-		}
-	}
+	@FindBy(xpath = "(//button[@type='submit'])[1]")
+	private WebElement otpVerificationPage;
 
 	public void enterOtp(String otp) {
 
-		wait.until(ExpectedConditions.visibilityOfElementLocated(otpField)).clear();
-
-		driver.findElement(otpField).sendKeys(otp);
+		elementUtils.fillValue(otpField, otp);
 	}
 
 	public void clickVerify() {
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
-		WebElement button = wait.until(
-		ExpectedConditions.visibilityOfElementLocated(verifyButton)
-		);
+		WebElement verifyButton = wait.until(ExpectedConditions.elementToBeClickable(verifyButtonElement));
 
-		((JavascriptExecutor) driver).executeScript(
-		"arguments[0].scrollIntoView({block:'center', inline:'center'});",
-		button
-		);
-
-		wait.until(
-		ExpectedConditions.elementToBeClickable(verifyButton)
-		);
+		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", verifyButton);
 
 		try {
+			verifyButton.click();
+		} catch (ElementNotInteractableException e) {
+			((JavascriptExecutor) driver).executeScript("arguments[0].click();", verifyButton);
+		}
+	}
 
-		button.click();
-
-		} catch (ElementClickInterceptedException e) {
-
-		((JavascriptExecutor) driver).executeScript(
-		"arguments[0].click();",
-		button
-		);
+	public boolean isOtpVerificationPageDisplayed() {
+		try {
+			return otpField.isDisplayed() && otpField.isEnabled();
+		} catch (NoSuchElementException | StaleElementReferenceException e) {
+			return false;
 		}
 	}
 }

@@ -2,10 +2,10 @@ package stepdefinitions;
 
 import org.testng.Assert;
 
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import pages.BatchesAttendancePage;
+import utils.ConfigReader;
 import utils.DriverFactory;
 
 public class BatchSteps {
@@ -26,20 +26,100 @@ public class BatchSteps {
 		batchPage.clickCreateCohortBatch();
 	}
 
-	@And("user fills mandatory batch details")
+	@When("user fills mandatory batch details")
 	public void userFillsMandatoryBatchDetails() {
 
-		batchPage.selectCourse("Course Studio");
+		batchPage.selectCourse(ConfigReader.getProperty("batchCourseName"));
 
-		batchPage.enterCoordinator("Senior Faculty");
+		batchPage.enterCoordinator(ConfigReader.getProperty("batchCoordinator"));
 
-		batchPage.selectWeeklySchedule("Mon, Wed, Fri");
+		batchPage.enterWeeklySchedule(ConfigReader.getProperty("batchWeeklySchedule"));
 
-		batchPage.enterStartDate("30-09-2026");
+		batchPage.enterStartDate(ConfigReader.getProperty("batchStartDate"));
 
-		batchPage.enterEndDate("29-12-2026");
+		batchPage.enterEndDate(ConfigReader.getProperty("batchEndDate"));
 
-		batchPage.enterSeatCapacity("30");
+		batchPage.enterSeatCapacity(ConfigReader.getProperty("batchSeatCapacity"));
+	}
+
+	@When("user leaves batch coordinator blank")
+	public void userLeavesBatchCoordinatorBlank() {
+
+		batchPage.selectCourse(ConfigReader.getProperty("batchCourseName"));
+
+		batchPage.enterCoordinator(ConfigReader.getProperty("invalidBatchCoordinator"));
+
+		batchPage.enterWeeklySchedule(ConfigReader.getProperty("batchWeeklySchedule"));
+
+		batchPage.enterStartDate(ConfigReader.getProperty("batchStartDate"));
+
+		batchPage.enterEndDate(ConfigReader.getProperty("batchEndDate"));
+
+		batchPage.enterSeatCapacity(ConfigReader.getProperty("batchSeatCapacity"));
+	}
+
+	@When("user enters an invalid batch start date")
+	public void userEntersInvalidBatchStartDate() {
+
+		batchPage.selectCourse(ConfigReader.getProperty("batchCourseName"));
+
+		batchPage.enterCoordinator(ConfigReader.getProperty("batchCoordinator"));
+
+		batchPage.enterWeeklySchedule(ConfigReader.getProperty("batchWeeklySchedule"));
+
+		batchPage.enterStartDate(ConfigReader.getProperty("invalidBatchStartDate"));
+
+		batchPage.enterEndDate(ConfigReader.getProperty("batchEndDate"));
+
+		batchPage.enterSeatCapacity(ConfigReader.getProperty("batchSeatCapacity"));
+	}
+
+	@When("user enters an invalid batch end date")
+	public void userEntersInvalidBatchEndDate() {
+
+		batchPage.selectCourse(ConfigReader.getProperty("batchCourseName"));
+
+		batchPage.enterCoordinator(ConfigReader.getProperty("batchCoordinator"));
+
+		batchPage.enterWeeklySchedule(ConfigReader.getProperty("batchWeeklySchedule"));
+
+		batchPage.enterStartDate(ConfigReader.getProperty("batchStartDate"));
+
+		batchPage.enterEndDate(ConfigReader.getProperty("invalidBatchEndDate"));
+
+		batchPage.enterSeatCapacity(ConfigReader.getProperty("batchSeatCapacity"));
+	}
+
+	@When("user enters zero batch seat capacity")
+	public void userEntersZeroBatchSeatCapacity() {
+
+		batchPage.selectCourse(ConfigReader.getProperty("batchCourseName"));
+
+		batchPage.enterCoordinator(ConfigReader.getProperty("batchCoordinator"));
+
+		batchPage.enterWeeklySchedule(ConfigReader.getProperty("batchWeeklySchedule"));
+
+		batchPage.enterStartDate(ConfigReader.getProperty("batchStartDate"));
+
+		batchPage.enterEndDate(ConfigReader.getProperty("batchEndDate"));
+
+		batchPage.enterSeatCapacity(ConfigReader.getProperty("invalidBatchSeatCapacity"));
+	}
+
+	@When("user enters negative batch seat capacity")
+	public void userEntersNegativeBatchSeatCapacity() {
+
+		batchPage.selectCourse(ConfigReader.getProperty("batchCourseName"));
+
+		batchPage.enterCoordinator(ConfigReader.getProperty("batchCoordinator"));
+
+		batchPage.enterWeeklySchedule(ConfigReader.getProperty("batchWeeklySchedule"));
+
+		batchPage.enterStartDate(ConfigReader.getProperty("batchStartDate"));
+
+		batchPage.enterEndDate(ConfigReader.getProperty("batchEndDate"));
+
+		batchPage.enterSeatCapacity(ConfigReader.getProperty("negativeBatchSeatCapacity"));
 	}
 
 	@When("user generates batch sessions")
@@ -52,5 +132,11 @@ public class BatchSteps {
 	public void cohortSessionsShouldBeGenerated() {
 
 		Assert.assertTrue(batchPage.isBatchCreated(), "Cohort sessions were not generated");
+	}
+
+	@Then("cohort sessions should not be generated")
+	public void cohortSessionsShouldNotBeGenerated() {
+
+		Assert.assertFalse(batchPage.isBatchCreated(), "Cohort sessions were generated with invalid data");
 	}
 }

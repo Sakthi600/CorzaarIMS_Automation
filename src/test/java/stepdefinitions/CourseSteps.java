@@ -5,6 +5,7 @@ import org.testng.Assert;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import pages.CourseStudioPage;
+import utils.ConfigReader;
 import utils.DriverFactory;
 
 public class CourseSteps {
@@ -28,27 +29,85 @@ public class CourseSteps {
 	@When("user fills mandatory course details")
 	public void userFillsMandatoryCourseDetails() {
 
-		String courseTitle = "Selenium Automation Testing";
+		coursePage.enterCourseTitle(ConfigReader.getProperty("courseTitle"));
 
-		String tuitionFee = "4999";
+		coursePage.enterTuitionFee(ConfigReader.getProperty("courseTuitionFee"));
 
-		String programDuration = "3 Months";
+		coursePage.enterProgramDuration(ConfigReader.getProperty("courseProgramDuration"));
 
-		String overview = "This program provides practical knowledge " + "of Selenium Java Cucumber and TestNG "
-				+ "automation testing.";
+		coursePage.enterCourseOverview(ConfigReader.getProperty("courseOverview"));
 
-		String moduleTitle = "Module 1: Automation Foundations";
+		coursePage.enterModuleTitle(ConfigReader.getProperty("courseModuleTitle"));
+	}
 
-		coursePage.enterCourseTitle(courseTitle);
+	@When("user leaves the course title blank")
+	public void userLeavesCourseTitleBlank() {
 
-		coursePage.enterTuitionFee(tuitionFee);
+		coursePage.enterCourseTitle(ConfigReader.getProperty("invalidCourseTitle"));
 
-		coursePage.selectProgramDuration(programDuration);
+		coursePage.enterTuitionFee(ConfigReader.getProperty("courseTuitionFee"));
 
-		coursePage.enterCourseOverview(overview);
+		coursePage.enterProgramDuration(ConfigReader.getProperty("courseProgramDuration"));
 
-		coursePage.enterModuleTitle(moduleTitle);
+		coursePage.enterCourseOverview(ConfigReader.getProperty("courseOverview"));
 
+		coursePage.enterModuleTitle(ConfigReader.getProperty("courseModuleTitle"));
+	}
+
+	@When("user enters an invalid tuition fee")
+	public void userEntersInvalidTuitionFee() {
+
+		coursePage.enterCourseTitle(ConfigReader.getProperty("courseTitle"));
+
+		coursePage.enterTuitionFee(ConfigReader.getProperty("invalidTuitionFee"));
+
+		coursePage.enterProgramDuration(ConfigReader.getProperty("courseProgramDuration"));
+
+		coursePage.enterCourseOverview(ConfigReader.getProperty("courseOverview"));
+
+		coursePage.enterModuleTitle(ConfigReader.getProperty("courseModuleTitle"));
+	}
+
+	@When("user enters an invalid program duration")
+	public void userEntersInvalidProgramDuration() {
+
+		coursePage.enterCourseTitle(ConfigReader.getProperty("courseTitle"));
+
+		coursePage.enterTuitionFee(ConfigReader.getProperty("courseTuitionFee"));
+
+		coursePage.enterProgramDuration(ConfigReader.getProperty("invalidProgramDuration"));
+
+		coursePage.enterCourseOverview(ConfigReader.getProperty("courseOverview"));
+
+		coursePage.enterModuleTitle(ConfigReader.getProperty("courseModuleTitle"));
+	}
+
+	@When("user leaves the course overview blank")
+	public void userLeavesCourseOverviewBlank() {
+
+		coursePage.enterCourseTitle(ConfigReader.getProperty("courseTitle"));
+
+		coursePage.enterTuitionFee(ConfigReader.getProperty("courseTuitionFee"));
+
+		coursePage.enterProgramDuration(ConfigReader.getProperty("courseProgramDuration"));
+
+		coursePage.enterCourseOverview(ConfigReader.getProperty("invalidCourseOverview"));
+
+		coursePage.enterModuleTitle(ConfigReader.getProperty("courseModuleTitle"));
+	}
+
+	@When("user leaves the module title blank")
+	public void userLeavesModuleTitleBlank() {
+
+		coursePage.enterCourseTitle(ConfigReader.getProperty("courseTitle"));
+
+		coursePage.enterTuitionFee(ConfigReader.getProperty("courseTuitionFee"));
+
+		coursePage.enterProgramDuration(ConfigReader.getProperty("courseProgramDuration"));
+
+		coursePage.enterCourseOverview(ConfigReader.getProperty("courseOverview"));
+
+		coursePage.enterModuleTitle(ConfigReader.getProperty("invalidModuleTitle"));
 	}
 
 	@When("user submits the course")
@@ -63,16 +122,22 @@ public class CourseSteps {
 		Assert.assertTrue(coursePage.isCourseUnderReview(), "Course was not moved to Under Review status");
 	}
 
-	@When("user edits the course {string} to {string}")
-	public void userEditsTheCourseTo(String courseName, String updatedCourseName) {
+	@Then("course should not be submitted for administrative review")
+	public void courseShouldNotBeSubmittedForAdministrativeReview() {
 
-		coursePage.editCourse(courseName, updatedCourseName);
+		Assert.assertFalse(coursePage.isCourseUnderReview(),
+				"Course was submitted even though invalid data was entered");
 	}
 
-	@When("user deletes the course {string}")
-	public void userDeletesTheCourse(String courseName) {
+	@When("user edits the configured course")
+	public void userEditsTheConfiguredCourse() {
 
-		coursePage.deleteCourse(courseName);
+		coursePage.editCourse(ConfigReader.getProperty("courseToEdit"), ConfigReader.getProperty("updatedCourseTitle"));
 	}
 
+	@When("user deletes the configured course")
+	public void userDeletesTheConfiguredCourse() {
+
+		coursePage.deleteCourse(ConfigReader.getProperty("courseToDelete"));
+	}
 }

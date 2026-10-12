@@ -3,143 +3,203 @@ package pages;
 import java.time.Duration;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import utils.ElementUtils;
 
 public class CertificatesApprovalsPage {
 
 	private WebDriver driver;
-	private WebDriverWait wait;
+
+	private ElementUtils elementUtils;
 
 	public CertificatesApprovalsPage(WebDriver driver) {
+
 		this.driver = driver;
-		this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+
+		this.elementUtils = new ElementUtils(driver);
+
+		PageFactory.initElements(driver, this);
 	}
 
-	private By certificatesApprovalsMenu = By.xpath("//span[text()='Certificates & Approvals']");
+	@FindBy(xpath = "//span[text()='Certificates & Approvals']")
+	private WebElement certificatesApprovalsMenu;
 
-	private By pageTitle = By.xpath("//*[normalize-space()='Certificates & Approvals']");
+	@FindBy(xpath = "//*[normalize-space()='Certificates & Approvals']")
+	private WebElement pageTitle;
 
-	private By pendingApprovals = By.xpath("//*[normalize-space()='Pending Approvals']");
+	@FindBy(xpath = "//*[normalize-space()='Pending Approvals']")
+	private WebElement pendingApprovals;
 
-	private By templatesStudio = By.xpath("//*[normalize-space()='Templates Studio']");
+	@FindBy(xpath = "//*[normalize-space()='Templates Studio']")
+	private WebElement templatesStudio;
 
-	private By learnerProgram = By
-			.xpath("//*[normalize-space()='LEARNER & PROGRAM']" + " | //*[normalize-space()='Learner & Program']");
+	@FindBy(xpath = "//*[normalize-space()='LEARNER & PROGRAM']" + " | //*[normalize-space()='Learner & Program']")
+	private WebElement learnerProgram;
 
-	private By certificateId = By.xpath("//th[normalize-space()='Certificate ID']");
+	@FindBy(xpath = "//th[normalize-space()='Certificate ID']")
+	private WebElement certificateId;
 
-	private By completedOn = By.xpath("//th[normalize-space()='Completed On']");
+	@FindBy(xpath = "//th[normalize-space()='Completed On']")
+	private WebElement completedOn;
 
-	private By reviewDecision = By.xpath("//th[text()='Review & Decision']");
+	@FindBy(xpath = "//th[normalize-space()='Review & Decision']")
+	private WebElement reviewDecision;
 
-	private By noPendingMessage = By.xpath("//td[text()='No student credentials awaiting manual sign-off.']");
+	@FindBy(xpath = "//td[text()='No student credentials awaiting manual sign-off.']")
+	private WebElement noPendingMessage;
 
-	private By templateStudio = By.xpath("//span[normalize-space()='Templates Studio']");
-	private By newTemplateButton = By.xpath("//span[normalize-space()='New Template']");
+	@FindBy(xpath = "//span[normalize-space()='Templates Studio']")
+	private WebElement templateStudio;
 
-	private By templateNameField = By.xpath("//input[@id='template-name']");
+	@FindBy(xpath = "//span[normalize-space()='New Template']")
+	private WebElement newTemplateButton;
 
-	private By brandingColorField = By.xpath("//input[@id='branding-accent-color']");
+	@FindBy(xpath = "//input[@id='template-name']")
+	private WebElement templateNameField;
 
-	private By signatoryField = By.xpath("(//input[@id='signatory-title-&-name'])[1]");
+	@FindBy(xpath = "//input[@id='branding-accent-color']")
+	private WebElement brandingAccentColorField;
 
-	private By saveTemplateButton = By.xpath("//span[normalize-space()='Save Template']");
+	@FindBy(xpath = "(//input[@id='signatory-title-&-name'])[1]")
+	private WebElement signatoryField;
 
-	private By templateCreatedMessage = By.xpath(
-			"(//div[@class='fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none'])[1]");
+	@FindBy(xpath = "//span[normalize-space()='Save Template']")
+	private WebElement saveTemplateButton;
+
+	@FindBy(xpath = "(//span[normalize-space()='Cancel'])[1]")
+	private WebElement cancelButton;
 
 	public void openCertificatesApprovals() {
 
-		WebElement menu = wait.until(ExpectedConditions.elementToBeClickable(certificatesApprovalsMenu));
-
-		menu.click();
+		elementUtils.click(certificatesApprovalsMenu);
 	}
 
 	public boolean isCertificatesApprovalsPageDisplayed() {
 
-		return wait.until(ExpectedConditions.visibilityOfElementLocated(pageTitle)).isDisplayed();
+		return elementUtils.isDisplayed(pageTitle);
 	}
 
 	public boolean isPendingApprovalsDisplayed() {
 
-		return wait.until(ExpectedConditions.visibilityOfElementLocated(pendingApprovals)).isDisplayed();
+		return elementUtils.isDisplayed(pendingApprovals);
 	}
 
 	public boolean isTemplatesStudioDisplayed() {
 
-		return wait.until(ExpectedConditions.visibilityOfElementLocated(templatesStudio)).isDisplayed();
+		return elementUtils.isDisplayed(templatesStudio);
 	}
 
 	public boolean isLearnerProgramDisplayed() {
 
-		return wait.until(ExpectedConditions.visibilityOfElementLocated(learnerProgram)).isDisplayed();
+		return elementUtils.isDisplayed(learnerProgram);
 	}
 
 	public boolean isCertificateIdDisplayed() {
 
-		return wait.until(ExpectedConditions.visibilityOfElementLocated(certificateId)).isDisplayed();
+		return elementUtils.isDisplayed(certificateId);
 	}
 
 	public boolean isCompletedOnDisplayed() {
 
-		return wait.until(ExpectedConditions.visibilityOfElementLocated(completedOn)).isDisplayed();
+		return elementUtils.isDisplayed(completedOn);
 	}
 
 	public boolean isReviewDecisionDisplayed() {
 
-		return wait.until(ExpectedConditions.visibilityOfElementLocated(reviewDecision)).isDisplayed();
+		return elementUtils.isDisplayed(reviewDecision);
 	}
 
 	public boolean isNoPendingMessageDisplayed() {
 
-		return wait.until(ExpectedConditions.visibilityOfElementLocated(noPendingMessage)).isDisplayed();
+		return elementUtils.isDisplayed(noPendingMessage);
 	}
 
 	public void clickTemplateStudio() {
 
-		wait.until(ExpectedConditions.elementToBeClickable(templateStudio)).click();
+		elementUtils.click(templateStudio);
 	}
 
 	public void clickNewTemplate() {
 
-		wait.until(ExpectedConditions.elementToBeClickable(newTemplateButton)).click();
+		elementUtils.click(newTemplateButton);
 	}
 
 	public void enterTemplateName(String templateName) {
 
-		WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(templateNameField));
-
-		element.clear();
-		element.sendKeys(templateName);
+		elementUtils.fillValue(templateNameField, templateName);
 	}
 
-	public void selectBrandingAccentColor() {
+	public void enterBrandingAccentColor(String color) {
 
-		WebElement colorField = wait.until(ExpectedConditions.presenceOfElementLocated(brandingColorField));
-
-		colorField.click();
+		elementUtils.fillValue(brandingAccentColorField, color);
 	}
 
 	public void enterSignatory(String signatory) {
 
-		WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(signatoryField));
-
-		element.click();
-		element.clear();
-		element.sendKeys(signatory);
+		elementUtils.fillValue(signatoryField, signatory);
 	}
 
 	public void clickSaveTemplate() {
 
-		wait.until(ExpectedConditions.elementToBeClickable(saveTemplateButton)).click();
+		elementUtils.click(saveTemplateButton);
 	}
+
+	public void clickCancel() {
+		elementUtils.click(cancelButton);
+	}
+
+	@FindBy(xpath = "(//h4[normalize-space()='Template Created'])[1]")
+	private WebElement templateSuccessMessage;
 
 	public boolean isTemplateCreatedSuccessfully() {
+		try {
+			WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
-		return wait.until(ExpectedConditions.visibilityOfElementLocated(templateCreatedMessage)).isDisplayed();
+			return wait.until(ExpectedConditions.visibilityOf(templateSuccessMessage)).isDisplayed();
+
+		} catch (TimeoutException e) {
+			return false;
+		}
 	}
 
+	public void editTemplate(String existingTemplateName, String updatedTemplateName, String updatedSignatory) {
+
+		By templateRowLocator = By.xpath("//*[normalize-space()='" + existingTemplateName + "']/ancestor::tr[1]");
+
+		WebElement templateRow = driver.findElement(templateRowLocator);
+
+		WebElement editButton = templateRow.findElement(By.xpath(".//button[@title='Edit Template']"));
+
+		elementUtils.click(editButton);
+
+		elementUtils.fillValue(templateNameField, updatedTemplateName);
+
+		elementUtils.fillValue(signatoryField, updatedSignatory);
+
+		WebElement saveButton = driver.findElement(By.xpath("(//button[@type='submit'])[1]"));
+
+		elementUtils.click(saveButton);
+	}
+
+	public void deleteTemplate(String templateName) {
+
+		By templateRowLocator = By.xpath("//*[normalize-space()='" + templateName + "']/ancestor::tr[1]");
+
+		WebElement templateRow = driver.findElement(templateRowLocator);
+
+		WebElement deleteButton = templateRow.findElement(By.xpath(".//button[@title='Delete Template']"));
+
+		elementUtils.click(deleteButton);
+
+		WebElement confirmDelete = driver.findElement(By.xpath("//span[normalize-space()='Yes, Delete Template']"));
+
+		elementUtils.click(confirmDelete);
+	}
 }

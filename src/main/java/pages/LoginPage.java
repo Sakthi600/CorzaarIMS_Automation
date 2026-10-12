@@ -2,65 +2,75 @@ package pages;
 
 import java.time.Duration;
 
-import org.openqa.selenium.By;
+import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.JavascriptExecutor;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import utils.ElementUtils;
+
 public class LoginPage {
 
-	private WebDriver driver;
 	private WebDriverWait wait;
+	private WebDriver driver;
+	private ElementUtils elementUtils;
 
 	public LoginPage(WebDriver driver) {
+
 		this.driver = driver;
+
 		this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+		PageFactory.initElements(driver, this);
+		this.elementUtils = new ElementUtils(driver);
+
 	}
 
-	private By mobileNumber = By.xpath("(//input[@id='institute-manager-mobile-number'])[1]");
+	@FindBy(xpath = "(//input[@id='institute-manager-mobile-number'])[1]")
+	private WebElement mobileNumber;
 
-	private By contactPerson = By.xpath("(//input[@id='institute-contact-person-/-faculty-name'])[1]");
+	@FindBy(xpath = "(//input[@id='institute-contact-person-/-faculty-name'])[1]")
+	private WebElement contactPerson;
 
-	private By sendVerificationCode = By.xpath("(//button[@type='submit'])[1]");
+	@FindBy(xpath = "//button[.//span[normalize-space()='Send Institute Verification Code']]")
+	private WebElement sendVerificationCode;
 
-	private By verifyAndEnterMerchantStudio = By.xpath("//span[normalize-space()='Verify & Enter Merchant Studio']");
+	@FindBy(xpath = "(//button[@title='Sign out'])[1]")
+	private WebElement signOut;
 
 	public void enterMobileNumber(String mobile) {
 
-		WebElement mobileField = wait.until(ExpectedConditions.visibilityOfElementLocated(mobileNumber));
-
-		mobileField.clear();
-		mobileField.sendKeys(mobile);
+		elementUtils.fillValue(mobileNumber, mobile);
 	}
 
 	public void enterContactPerson(String name) {
 
-		WebElement contactField = wait.until(ExpectedConditions.visibilityOfElementLocated(contactPerson));
-
-		contactField.clear();
-		contactField.sendKeys(name);
+		elementUtils.fillValue(contactPerson, name);
 	}
 
 	public void clickSendVerificationCode() {
 
-		WebElement button = wait.until(ExpectedConditions.presenceOfElementLocated(sendVerificationCode));
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
-		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center', inline:'center'});",
-				button);
+		wait.until(ExpectedConditions.visibilityOf(sendVerificationCode));
 
-		wait.until(ExpectedConditions.visibilityOf(button));
+		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});",
+				sendVerificationCode);
+
+		wait.until(ExpectedConditions.elementToBeClickable(sendVerificationCode));
 
 		try {
-
-			wait.until(ExpectedConditions.elementToBeClickable(button));
-
-			button.click();
-
-		} catch (org.openqa.selenium.ElementClickInterceptedException e) {
-
-			((JavascriptExecutor) driver).executeScript("arguments[0].click();", button);
+			sendVerificationCode.click();
+		} catch (ElementClickInterceptedException e) {
+			((JavascriptExecutor) driver).executeScript("arguments[0].click();", sendVerificationCode);
 		}
+	}
+
+	public void clickSignOut() {
+		elementUtils.click(signOut);
 	}
 }

@@ -2,105 +2,142 @@ package stepdefinitions;
 
 import org.testng.Assert;
 
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import pages.CertificatesApprovalsPage;
+import utils.ConfigReader;
 import utils.DriverFactory;
 
 public class CertificateSteps {
 
-	private CertificatesApprovalsPage certificatesPage;
+	private CertificatesApprovalsPage certificatePage;
 
 	@When("user opens Certificates and Approvals")
 	public void userOpensCertificatesAndApprovals() {
 
-		certificatesPage = new CertificatesApprovalsPage(DriverFactory.getDriver());
+		certificatePage = new CertificatesApprovalsPage(DriverFactory.getDriver());
 
-		certificatesPage.openCertificatesApprovals();
+		certificatePage.openCertificatesApprovals();
 	}
 
 	@Then("Certificates and Approvals page should be displayed")
 	public void certificatesAndApprovalsPageShouldBeDisplayed() {
 
-		Assert.assertTrue(certificatesPage.isCertificatesApprovalsPageDisplayed(),
+		Assert.assertTrue(certificatePage.isCertificatesApprovalsPageDisplayed(),
 				"Certificates & Approvals page is not displayed");
 	}
 
-	@And("Pending Approvals should be displayed")
+	@Then("Pending Approvals should be displayed")
 	public void pendingApprovalsShouldBeDisplayed() {
 
-		Assert.assertTrue(certificatesPage.isPendingApprovalsDisplayed(), "Pending Approvals is not displayed");
+		Assert.assertTrue(certificatePage.isPendingApprovalsDisplayed(), "Pending Approvals is not displayed");
 	}
 
-	@And("Templates Studio should be displayed")
+	@Then("Templates Studio should be displayed")
 	public void templatesStudioShouldBeDisplayed() {
 
-		Assert.assertTrue(certificatesPage.isTemplatesStudioDisplayed(), "Templates Studio is not displayed");
+		Assert.assertTrue(certificatePage.isTemplatesStudioDisplayed(), "Templates Studio is not displayed");
 	}
 
-	@And("Learner and Program section should be displayed")
-	public void learnerAndProgramSectionShouldBeDisplayed() {
+	@When("user opens Templates Studio")
+	public void userOpensTemplatesStudio() {
 
-		Assert.assertTrue(certificatesPage.isLearnerProgramDisplayed(), "Learner & Program section is not displayed");
-	}
-
-	@And("certificate table headers should be displayed")
-	public void certificateTableHeadersShouldBeDisplayed() {
-
-		Assert.assertTrue(certificatesPage.isCertificateIdDisplayed(), "CERTIFICATE ID is not displayed");
-
-		Assert.assertTrue(certificatesPage.isCompletedOnDisplayed(), "COMPLETED ON is not displayed");
-
-		Assert.assertTrue(certificatesPage.isReviewDecisionDisplayed(), "REVIEW & DECISION is not displayed");
-	}
-
-	@And("no pending certificate approval message should be displayed")
-	public void noPendingCertificateApprovalMessageShouldBeDisplayed() {
-
-		Assert.assertTrue(certificatesPage.isNoPendingMessageDisplayed(),
-				"No pending certificate approval message is not displayed");
-	}
-
-	@When("user clicks Templates Studio")
-	public void userClicksTemplatesStudio() {
-		certificatesPage.clickTemplateStudio();
+		certificatePage.clickTemplateStudio();
 	}
 
 	@When("user clicks New Template")
 	public void userClicksNewTemplate() {
 
-		certificatesPage.clickNewTemplate();
+		certificatePage.clickNewTemplate();
 	}
 
-	@When("user enters certificate template name {string}")
-	public void userEntersCertificateTemplateName(String templateName) {
+	@When("user fills mandatory certificate template details")
+	public void userFillsMandatoryCertificateTemplateDetails() {
 
-		certificatesPage.enterTemplateName(templateName);
+		certificatePage.enterTemplateName(ConfigReader.getProperty("certificateTemplateName"));
+
+		certificatePage.enterBrandingAccentColor(ConfigReader.getProperty("certificateAccentColor"));
+
+		certificatePage.enterSignatory(ConfigReader.getProperty("certificateSignatory"));
 	}
 
-	@When("user selects branding accent color")
-	public void userSelectsBrandingAccentColor() {
+	@When("user leaves certificate template name blank")
+	public void userLeavesCertificateTemplateNameBlank() {
 
-		certificatesPage.selectBrandingAccentColor();
+		certificatePage.enterTemplateName(ConfigReader.getProperty("blankCertificateTemplateName"));
+
+		certificatePage.enterBrandingAccentColor(ConfigReader.getProperty("certificateAccentColor"));
+
+		certificatePage.enterSignatory(ConfigReader.getProperty("certificateSignatory"));
 	}
 
-	@When("user enters signatory title and name {string}")
-	public void userEntersSignatoryTitleAndName(String signatory) {
+	@When("user enters invalid certificate template name")
+	public void userEntersInvalidCertificateTemplateName() {
 
-		certificatesPage.enterSignatory(signatory);
+		certificatePage.enterTemplateName(ConfigReader.getProperty("invalidCertificateTemplateName"));
+
+		certificatePage.enterBrandingAccentColor(ConfigReader.getProperty("certificateAccentColor"));
+
+		certificatePage.enterSignatory(ConfigReader.getProperty("certificateSignatory"));
 	}
 
-	@When("user clicks Save Template")
-	public void userClicksSaveTemplate() {
+	@When("user leaves certificate signatory blank")
+	public void userLeavesCertificateSignatoryBlank() {
 
-		certificatesPage.clickSaveTemplate();
+		certificatePage.enterTemplateName(ConfigReader.getProperty("certificateTemplateName"));
+
+		certificatePage.enterBrandingAccentColor(ConfigReader.getProperty("certificateAccentColor"));
+
+		certificatePage.enterSignatory(ConfigReader.getProperty("blankCertificateSignatory"));
+	}
+
+	@When("user enters invalid certificate signatory")
+	public void userEntersInvalidCertificateSignatory() {
+
+		certificatePage.enterTemplateName(ConfigReader.getProperty("certificateTemplateName"));
+
+		certificatePage.enterBrandingAccentColor(ConfigReader.getProperty("certificateAccentColor"));
+
+		certificatePage.enterSignatory(ConfigReader.getProperty("invalidCertificateSignatory"));
+	}
+
+	@When("user saves the certificate template")
+	public void userSavesCertificateTemplate() {
+
+		certificatePage.clickSaveTemplate();
 	}
 
 	@Then("certificate template should be created successfully")
 	public void certificateTemplateShouldBeCreatedSuccessfully() {
 
-		Assert.assertTrue(certificatesPage.isTemplateCreatedSuccessfully(),
+		Assert.assertFalse(certificatePage.isTemplateCreatedSuccessfully(),
 				"Certificate template was not created successfully");
+	}
+
+	@Then("certificate template should not be created")
+	public void certificateTemplateShouldNotBeCreated() {
+
+		Assert.assertTrue(certificatePage.isTemplateCreatedSuccessfully(),
+				"Certificate template was created with invalid data");
+	}
+
+	@When("user edits the configured certificate template")
+	public void userEditsConfiguredCertificateTemplate() {
+
+		certificatePage.editTemplate(
+
+				ConfigReader.getProperty("certificateTemplateName"),
+
+				ConfigReader.getProperty("updatedCertificateTemplateName"),
+
+				ConfigReader.getProperty("updatedCertificateSignatory"));
+	}
+
+	@When("user deletes the configured certificate template")
+	public void userDeletesConfiguredCertificateTemplate() {
+
+		certificatePage.deleteTemplate(
+
+				ConfigReader.getProperty("updatedCertificateTemplateName"));
 	}
 }

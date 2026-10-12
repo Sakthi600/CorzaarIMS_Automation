@@ -1,148 +1,139 @@
 package pages;
 
-import java.time.Duration;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+
+import utils.ElementUtils;
 
 public class CourseStudioPage {
 
 	private WebDriver driver;
-	private WebDriverWait wait;
+
+	private ElementUtils elementUtils;
 
 	public CourseStudioPage(WebDriver driver) {
 
 		this.driver = driver;
 
-		this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+		this.elementUtils = new ElementUtils(driver);
+
+		PageFactory.initElements(driver, this);
 	}
 
-	private By courseStudioMenu = By.xpath("//span[text()='Course Studio']");
+	@FindBy(xpath = "//span[text()='Course Studio']")
+	private WebElement courseStudioMenu;
 
-	private By createCourseButton = By.xpath("//span[text()='New Course Program']");
+	@FindBy(xpath = "//span[text()='New Course Program']")
+	private WebElement createCourseButton;
 
-	private By courseTitle = By.xpath("//input[@id='course-title']");
+	@FindBy(xpath = "//input[@id='course-title']")
+	private WebElement courseTitle;
 
-	private By tuitionFee = By.xpath("//input[@id='tuition-fee-(₹)']");
+	@FindBy(xpath = "//input[@id='tuition-fee-(₹)']")
+	private WebElement tuitionFee;
 
-	private By programDuration = By.xpath("//input[@id='program-duration']");
+	@FindBy(xpath = "//input[@id='program-duration']")
+	private WebElement programDuration;
 
-	private By courseOverview = By.xpath("//textarea[@id='course-overview-&-learning-outcomes']");
+	@FindBy(xpath = "//textarea[@id='course-overview-&-learning-outcomes']")
+	private WebElement courseOverview;
 
-	private By moduleTitle = By.xpath("(//input[@id='module-1-title'])[1]");
+	@FindBy(xpath = "(//input[@id='module-1-title'])[1]")
+	private WebElement moduleTitle;
 
-	private By publishCourseButton = By.xpath("//span[text()='Publish Course']");
+	@FindBy(xpath = "(//span[normalize-space()='Cancel'])[1]")
+	private WebElement cancelButton;
+
+	@FindBy(xpath = "//span[text()='Publish Course']")
+	private WebElement publishCourseButton;
+
+	@FindBy(xpath = "//*[contains(normalize-space(),'under_review')]"
+			+ " | //*[contains(normalize-space(),'Under Review')]" + " | //*[contains(normalize-space(),'In Review')]")
+	private WebElement courseUnderReviewStatus;
 
 	public void openCourseStudio() {
 
-		wait.until(ExpectedConditions.elementToBeClickable(courseStudioMenu)).click();
+		elementUtils.click(courseStudioMenu);
 	}
 
 	public void clickCreateCourse() {
 
-		wait.until(ExpectedConditions.elementToBeClickable(createCourseButton)).click();
+		elementUtils.click(createCourseButton);
 	}
 
 	public void enterCourseTitle(String title) {
 
-		WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(courseTitle));
-
-		element.clear();
-		element.sendKeys(title);
+		elementUtils.fillValue(courseTitle, title);
 	}
 
 	public void enterTuitionFee(String fee) {
 
-		WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(tuitionFee));
-
-		element.clear();
-		element.sendKeys(fee);
+		elementUtils.fillValue(tuitionFee, fee);
 	}
 
-	public void selectProgramDuration(String duration) {
+	public void enterProgramDuration(String duration) {
 
-		WebElement element = wait.until(ExpectedConditions.elementToBeClickable(programDuration));
-
-		element.clear();
-		element.sendKeys(duration);
+		elementUtils.fillValue(programDuration, duration);
 	}
 
 	public void enterCourseOverview(String overview) {
 
-		WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(courseOverview));
-
-		element.clear();
-		element.sendKeys(overview);
+		elementUtils.fillValue(courseOverview, overview);
 	}
 
 	public void enterModuleTitle(String title) {
 
-		WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(moduleTitle));
-
-		element.clear();
-		element.sendKeys(title);
+		elementUtils.fillValue(moduleTitle, title);
 	}
 
 	public void publishCourse() {
 
-		wait.until(ExpectedConditions.elementToBeClickable(publishCourseButton)).click();
+		elementUtils.click(publishCourseButton);
+	}
+
+	public void clickCancel() {
+		elementUtils.click(cancelButton);
 	}
 
 	public boolean isCourseUnderReview() {
 
-		By status = By.xpath(
-				"//*[contains(normalize-space(),'under_review')]" + " | //*[contains(normalize-space(),'Under Review')]"
-						+ " | //*[contains(normalize-space(),'In Review')]");
-
-		try {
-
-			return wait.until(ExpectedConditions.visibilityOfElementLocated(status)).isDisplayed();
-
-		} catch (Exception e) {
-
-			return false;
-		}
+		return elementUtils.isDisplayed(courseUnderReviewStatus);
 	}
 
 	public void editCourse(String courseName, String updatedCourseName) {
 
-		By courseRow = By.xpath("//*[normalize-space()='" + courseName + "']/ancestor::tr[1]");
+		By courseRowLocator = By.xpath("//*[normalize-space()='" + courseName + "']/ancestor::tr[1]");
 
-		WebElement row = wait.until(ExpectedConditions.visibilityOfElementLocated(courseRow));
+		WebElement courseRow = driver.findElement(courseRowLocator);
 
-		WebElement editButton = row.findElement(By.xpath("(//button[@title='Edit Course'])[1]"));
+		WebElement editButton = courseRow.findElement(By.xpath("(//button[@title='Edit Course'])[1]"));
 
-		wait.until(ExpectedConditions.elementToBeClickable(editButton)).click();
+		elementUtils.click(editButton);
 
-		WebElement courseTitle = wait
-				.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("(//input[@id='course-title'])[1]")));
+		WebElement courseTitleField = driver.findElement(By.xpath("(//input[@id='course-title'])[1]"));
 
-		courseTitle.clear();
-		courseTitle.sendKeys(updatedCourseName);
+		elementUtils.fillValue(courseTitleField, updatedCourseName);
 
-		WebElement saveButton = wait
-				.until(ExpectedConditions.elementToBeClickable(By.xpath("(//button[@type='submit'])[1]")));
+		WebElement saveButton = driver.findElement(By.xpath("(//button[@type='submit'])[1]"));
 
-		saveButton.click();
+		elementUtils.click(saveButton);
 	}
 
 	public void deleteCourse(String courseName) {
 
-		By courseRow = By.xpath("//*[normalize-space()='" + courseName + "']/ancestor::tr[1]");
+		By courseRowLocator = By.xpath("//*[normalize-space()='" + courseName + "']/ancestor::tr[1]");
 
-		WebElement row = wait.until(ExpectedConditions.visibilityOfElementLocated(courseRow));
+		WebElement courseRow = driver.findElement(courseRowLocator);
 
-		WebElement deleteButton = row.findElement(By.xpath("(//button[@title='Delete Course'])[1]"));
+		WebElement deleteButton = courseRow.findElement(By.xpath("(//button[@title='Delete Course'])[1]"));
 
-		wait.until(ExpectedConditions.elementToBeClickable(deleteButton)).click();
+		elementUtils.click(deleteButton);
 
-		WebElement confirmDelete = wait
-				.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[text()='Yes, Delete Course']")));
+		WebElement confirmDelete = driver.findElement(By.xpath("//span[text()='Yes, Delete Course']"));
 
-		confirmDelete.click();
+		elementUtils.click(confirmDelete);
 	}
-
 }

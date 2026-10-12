@@ -5,6 +5,7 @@ import org.testng.Assert;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import pages.CouponsPage;
+import utils.ConfigReader;
 import utils.DriverFactory;
 
 public class CouponSteps {
@@ -28,17 +29,67 @@ public class CouponSteps {
 	@When("user fills mandatory coupon details")
 	public void userFillsMandatoryCouponDetails() {
 
-		String couponCode = "AUTO20";
+		couponPage.enterCouponCode(ConfigReader.getProperty("couponCode"));
 
-		String discount = "20";
-
-		couponPage.enterCouponCode(couponCode);
-
-		couponPage.enterDiscountPercentage(discount);
+		couponPage.enterDiscountPercentage(ConfigReader.getProperty("couponDiscount"));
 
 	}
 
-	@When("user submits coupon for approval")
+	@When("user leaves coupon code blank")
+	public void userLeavesCouponCodeBlank() {
+
+		couponPage.enterCouponCode(ConfigReader.getProperty("blankCouponCode"));
+
+		couponPage.enterDiscountPercentage(ConfigReader.getProperty("couponDiscount"));
+
+	}
+
+	@When("user enters an invalid coupon code")
+	public void userEntersInvalidCouponCode() {
+
+		couponPage.enterCouponCode(ConfigReader.getProperty("invalidCouponCode"));
+
+		couponPage.enterDiscountPercentage(ConfigReader.getProperty("couponDiscount"));
+
+	}
+
+	@When("user enters zero coupon discount")
+	public void userEntersZeroCouponDiscount() {
+
+		couponPage.enterCouponCode(ConfigReader.getProperty("couponCode"));
+
+		couponPage.enterDiscountPercentage(ConfigReader.getProperty("zeroCouponDiscount"));
+
+	}
+
+	@When("user enters coupon discount above one hundred")
+	public void userEntersCouponDiscountAboveOneHundred() {
+
+		couponPage.enterCouponCode(ConfigReader.getProperty("couponCode"));
+
+		couponPage.enterDiscountPercentage(ConfigReader.getProperty("excessCouponDiscount"));
+
+	}
+
+	@When("user enters negative coupon discount")
+	public void userEntersNegativeCouponDiscount() {
+
+		couponPage.enterCouponCode(ConfigReader.getProperty("couponCode"));
+
+		couponPage.enterDiscountPercentage(ConfigReader.getProperty("negativeCouponDiscount"));
+
+	}
+
+	@When("user enters zero coupon usage limit")
+	public void userEntersZeroCouponUsageLimit() {
+
+		couponPage.enterCouponCode(ConfigReader.getProperty("couponCode"));
+
+		couponPage.enterDiscountPercentage(ConfigReader.getProperty("couponDiscount"));
+
+	}
+
+	@When("user submits the coupon for approval")
 	public void userSubmitsCouponForApproval() {
 
 		couponPage.submitForApproval();
@@ -46,7 +97,25 @@ public class CouponSteps {
 
 	@Then("coupon should be submitted for approval")
 	public void couponShouldBeSubmittedForApproval() {
+		Assert.assertTrue(couponPage.isCouponPending(), "Coupon was not submitted for approval");
+	}
 
-		Assert.assertTrue(couponPage.isCouponPending(), "Coupon was not submitted in Pending status");
+	@Then("coupon should not be submitted for approval")
+	public void couponShouldNotBeSubmittedForApproval() {
+
+		Assert.assertTrue(couponPage.isCouponFormStillDisplayed(), "Invalid coupon form should remain displayed");
+	}
+
+	@When("user edits the configured coupon")
+	public void userEditsTheConfiguredCoupon() {
+
+		couponPage.editCoupon(ConfigReader.getProperty("couponCode"), ConfigReader.getProperty("updatedCouponCode"),
+				ConfigReader.getProperty("updatedCouponDiscount"));
+	}
+
+	@When("user deletes the configured coupon")
+	public void userDeletesTheConfiguredCoupon() {
+
+		couponPage.deleteCoupon(ConfigReader.getProperty("updatedCouponCode"));
 	}
 }

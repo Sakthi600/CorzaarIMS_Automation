@@ -1,77 +1,138 @@
 package pages;
 
-import java.time.Duration;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+
+import utils.ElementUtils;
 
 public class CouponsPage {
 
 	private WebDriver driver;
-	private WebDriverWait wait;
+	private ElementUtils elementUtils;
 
 	public CouponsPage(WebDriver driver) {
 
 		this.driver = driver;
+		this.elementUtils = new ElementUtils(driver);
 
-		this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+		PageFactory.initElements(driver, this);
 	}
 
-	private By couponsMenu = By.xpath("//span[normalize-space()='Coupons & Promos']");
+	@FindBy(xpath = "//span[normalize-space()='Coupons & Promos']")
+	private WebElement couponsMenu;
 
-	private By createCouponButton = By.xpath("//span[normalize-space()='Create Coupon']");
+	@FindBy(xpath = "//span[normalize-space()='Create Coupon']")
+	private WebElement createCouponButton;
 
-	private By couponCode = By.xpath("//input[@id='coupon-code']");
+	@FindBy(xpath = "//input[@id='coupon-code']")
+	private WebElement couponCode;
 
-	private By discountPercentage = By.xpath("//input[@id='discount-percentage-(%)']");
+	@FindBy(xpath = "//input[@id='discount-percentage-(%)']")
+	private WebElement discountPercentage;
 
-	private By submitApprovalButton = By.xpath("//span[text()='Submit for Approval']");
+	@FindBy(xpath = "//input[@id='usage-limit']")
+	private WebElement usageLimit;
+
+	@FindBy(xpath = "//span[normalize-space()='Submit for Approval']")
+	private WebElement submitApprovalButton;
+
+	@FindBy(xpath = "(//span[normalize-space()='Cancel'])[1]")
+	private WebElement cancelButton;
+
+	@FindBy(xpath = "//*[contains(translate(normalize-space(.)," + "'PENDING','pending'),'pending')]")
+	private WebElement pendingStatus;
 
 	public void openCoupons() {
 
-		wait.until(ExpectedConditions.elementToBeClickable(couponsMenu)).click();
+		elementUtils.click(couponsMenu);
 	}
 
 	public void clickCreateCoupon() {
 
-		wait.until(ExpectedConditions.elementToBeClickable(createCouponButton)).click();
+		elementUtils.click(createCouponButton);
 	}
 
 	public void enterCouponCode(String code) {
 
-		WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(couponCode));
-
-		element.clear();
-		element.sendKeys(code);
+		elementUtils.clear(couponCode);
+		elementUtils.fillValue(couponCode, code);
 	}
 
-	public void enterDiscountPercentage(String percentage) {
+	public void enterDiscountPercentage(String discount) {
 
-		WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(discountPercentage));
-
-		element.clear();
-		element.sendKeys(percentage);
+		elementUtils.clear(discountPercentage);
+		elementUtils.fillValue(discountPercentage, discount);
 	}
+
+	// =========================================================
+	// USAGE LIMIT
+	// =========================================================
+
+	/*
+	 * public void enterUsageLimit(String limit) {
+	 * 
+	 * elementUtils.fillValue(usageLimit, limit); }
+	 */
 
 	public void submitForApproval() {
 
-		wait.until(ExpectedConditions.elementToBeClickable(submitApprovalButton)).click();
+		elementUtils.click(submitApprovalButton);
+	}
+
+	public void clickCancel() {
+		elementUtils.click(cancelButton);
 	}
 
 	public boolean isCouponPending() {
-
-		By pendingStatus = By.xpath("//*[contains(translate(normalize-space(.)," + "'PENDING','pending'),'pending')]");
-
 		try {
-
-			return wait.until(ExpectedConditions.visibilityOfElementLocated(pendingStatus)).isDisplayed();
-
+			return elementUtils.isDisplayed(pendingStatus);
 		} catch (Exception e) {
-
 			return false;
 		}
+	}
+
+	public boolean isCouponFormStillDisplayed() {
+		try {
+			return couponCode.isDisplayed();
+		} catch (org.openqa.selenium.NoSuchElementException e) {
+			return false;
+		}
+	}
+
+	public void editCoupon(String existingCode, String updatedCode, String updatedDiscount) {
+
+		By couponRowLocator = By.xpath("//*[normalize-space()='" + existingCode + "']/ancestor::tr[1]");
+
+		WebElement couponRow = driver.findElement(couponRowLocator);
+
+		WebElement editButton = couponRow.findElement(By.xpath(".//button[@title='Edit Coupon']"));
+
+		elementUtils.click(editButton);
+
+		elementUtils.fillValue(couponCode, updatedCode);
+
+		elementUtils.fillValue(discountPercentage, updatedDiscount);
+
+		WebElement saveButton = driver.findElement(By.xpath("(//button[@type='submit'])[1]"));
+
+		elementUtils.click(saveButton);
+	}
+
+	public void deleteCoupon(String couponCodeValue) {
+
+		By couponRowLocator = By.xpath("//*[normalize-space()='" + couponCodeValue + "']/ancestor::tr[1]");
+
+		WebElement couponRow = driver.findElement(couponRowLocator);
+
+		WebElement deleteButton = couponRow.findElement(By.xpath(".//button[@title='Delete Coupon']"));
+
+		elementUtils.click(deleteButton);
+
+		WebElement confirmDelete = driver.findElement(By.xpath("//span[normalize-space()='Yes, Delete Coupon']"));
+
+		elementUtils.click(confirmDelete);
 	}
 }
