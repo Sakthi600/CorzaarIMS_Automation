@@ -39,6 +39,9 @@ public class OtpPage {
 	@FindBy(xpath = "(//button[@type='submit'])[1]")
 	private WebElement otpVerificationPage;
 
+	@FindBy(xpath = "//*[contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'invalid otp')]")
+	private WebElement invalidOtpMessage;
+
 	public void enterOtp(String otp) {
 
 		elementUtils.fillValue(otpField, otp);
@@ -65,4 +68,17 @@ public class OtpPage {
 			return false;
 		}
 	}
+
+	public String getOtpValue() {
+		return otpField.getAttribute("value");
+	}
+
+	public String getOtpValidationMessage() {
+		return otpField.getAttribute("validationMessage");
+	}
+
+	public boolean isInvalidOtpMessageDisplayed() {
+		return elementUtils.isDisplayed(invalidOtpMessage);
+	}
+
 }

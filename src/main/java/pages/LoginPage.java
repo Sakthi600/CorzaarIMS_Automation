@@ -39,8 +39,26 @@ public class LoginPage {
 	@FindBy(xpath = "//button[.//span[normalize-space()='Send Institute Verification Code']]")
 	private WebElement sendVerificationCode;
 
+	@FindBy(xpath = "//button[normalize-space()='Change'] | //span[normalize-space()='Change']")
+	private WebElement changeButton;
+
+// Add these fields inside your existing LoginPage class
+
 	@FindBy(xpath = "(//button[@title='Sign out'])[1]")
-	private WebElement signOut;
+	private WebElement logoutButton;
+	
+	@FindBy(xpath = "(//input[@id='learner-mobile-number'])[1]")
+	private WebElement learnermobileNumber;
+
+// Add these methods inside your existing LoginPage class
+
+	public void clickLogout() {
+		elementUtils.click(logoutButton);
+	}
+
+	public boolean isLoginPageDisplayed() {
+		return elementUtils.isDisplayed(learnermobileNumber);
+	}
 
 	public void enterMobileNumber(String mobile) {
 
@@ -50,6 +68,18 @@ public class LoginPage {
 	public void enterContactPerson(String name) {
 
 		elementUtils.fillValue(contactPerson, name);
+	}
+
+	public String getMobileNumberValue() {
+		return mobileNumber.getAttribute("value");
+	}
+
+	public String getMobileValidationMessage() {
+		return mobileNumber.getAttribute("validationMessage");
+	}
+
+	public boolean isMobileValueAccepted(String value) {
+		return value.equals(getMobileNumberValue());
 	}
 
 	public void clickSendVerificationCode() {
@@ -70,7 +100,9 @@ public class LoginPage {
 		}
 	}
 
-	public void clickSignOut() {
-		elementUtils.click(signOut);
+	public void clickChangeButton() {
+		elementUtils.click(changeButton);
 	}
+
+	
 }

@@ -1,83 +1,45 @@
 Feature: Merchant Course Authoring
-# =========================================================
-# POSITIVE - CREATE COURSE
-# =========================================================
 
   @merchant @course @positive
-  Scenario: Create Merchant Course using Mandatory Fields
+  Scenario: Create a course with module from the create screen
     When user opens Course Studio
     And user clicks Create New Course Program
     And user fills mandatory course details
-    And user submits the course
+    And user clicks Add Module
+    And user fills mandatory module details
+    Then an additional module section should be displayed
+    When user submits the course
     Then course should be submitted for administrative review
-# =========================================================
-# NEGATIVE - BLANK COURSE TITLE
-# =========================================================
 
   @merchant @course @negative
-  Scenario: Create course without course title
+  Scenario Outline: Verify negative course validations
     When user opens Course Studio
     And user clicks Create New Course Program
-    And user leaves the course title blank
-    And user submits the course
-    Then course should not be submitted for administrative review
-# =========================================================
-# NEGATIVE - INVALID TUITION FEE
-# =========================================================
+    And user tests course validation for "<TestCase>"
+    Then validation should be displayed for "<TestCase>"
+    And user clicks Add Module
+    Then an additional module section should be displayed
+    When user clicks the close button on the course program modal
+    Then the course program modal should be closed
 
-  @merchant @course @negative
-  Scenario: Create course with invalid tuition fee
-    When user opens Course Studio
-    And user clicks Create New Course Program
-    And user enters an invalid tuition fee
-    And user submits the course
-    Then course should not be submitted for administrative review
-# =========================================================
-# NEGATIVE - INVALID PROGRAM DURATION
-# =========================================================
+    Examples:
+      | TestCase           |
+      | MissingTitle       |
+      | MissingTuitionFee  |
+      | MissingDuration    |
+      | MissingOverview    |
+      | MissingModuleTitle |
 
-  @merchant @course @negative
-  Scenario: Create course with invalid program duration
-    When user opens Course Studio
-    And user clicks Create New Course Program
-    And user enters an invalid program duration
-    And user submits the course
-    Then course should not be submitted for administrative review
-# =========================================================
-# NEGATIVE - BLANK OVERVIEW
-# =========================================================
+  @merchant @course @update
+ Scenario: Update all course fields
+  When user opens Course Studio
+  And user clicks Edit for the course "Test Course"
+  And user edits all course fields
+  And user saves the course changes
+  Then the updated course should be displayed in the course table
 
-  @merchant @course @negative
-  Scenario: Create course without course overview
-    When user opens Course Studio
-    And user clicks Create New Course Program
-    And user leaves the course overview blank
-    And user submits the course
-    Then course should not be submitted for administrative review
-# =========================================================
-# NEGATIVE - BLANK MODULE
-# =========================================================
-
-  @merchant @course @negative
-  Scenario: Create course without module title
-    When user opens Course Studio
-    And user clicks Create New Course Program
-    And user leaves the module title blank
-    And user submits the course
-    Then course should not be submitted for administrative review
-# =========================================================
-# POSITIVE - EDIT COURSE
-# =========================================================
-
-  @merchant @course @positive @edit
-  Scenario: Edit existing merchant course
-    When user opens Course Studio
-    And user edits the configured course
-# =========================================================
-# POSITIVE - DELETE COURSE
-# =========================================================
-
-  @merchant @course @positive @delete
-  Scenario: Delete existing merchant course
-    When user opens Course Studio
-    And user deletes the configured course
+@merchant @course @delete
+Scenario: Delete existing merchant course
+  When user opens Course Studio
+  And user deletes the course "Selenium Automation Testing"
+  Then the deleted course should not be displayed in the course table

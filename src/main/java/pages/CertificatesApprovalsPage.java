@@ -2,7 +2,6 @@ package pages;
 
 import java.time.Duration;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -75,6 +74,15 @@ public class CertificatesApprovalsPage {
 
 	@FindBy(xpath = "(//span[normalize-space()='Cancel'])[1]")
 	private WebElement cancelButton;
+
+	@FindBy(xpath = "(//tbody/tr[1]//*[name()='svg'])[1]")
+	private WebElement previewButton;
+
+	@FindBy(xpath = "(//span[contains(text(),'Reject')])[1]")
+	private WebElement rejectButton;
+
+	@FindBy(xpath = "(//span[contains(text(),'Sign & Approve')])[1]")
+	private WebElement signAndApproveButton;
 
 	public void openCertificatesApprovals() {
 
@@ -169,37 +177,31 @@ public class CertificatesApprovalsPage {
 		}
 	}
 
-	public void editTemplate(String existingTemplateName, String updatedTemplateName, String updatedSignatory) {
-
-		By templateRowLocator = By.xpath("//*[normalize-space()='" + existingTemplateName + "']/ancestor::tr[1]");
-
-		WebElement templateRow = driver.findElement(templateRowLocator);
-
-		WebElement editButton = templateRow.findElement(By.xpath(".//button[@title='Edit Template']"));
-
-		elementUtils.click(editButton);
-
-		elementUtils.fillValue(templateNameField, updatedTemplateName);
-
-		elementUtils.fillValue(signatoryField, updatedSignatory);
-
-		WebElement saveButton = driver.findElement(By.xpath("(//button[@type='submit'])[1]"));
-
-		elementUtils.click(saveButton);
+	public void clickPreview() {
+		elementUtils.click(previewButton);
 	}
 
-	public void deleteTemplate(String templateName) {
-
-		By templateRowLocator = By.xpath("//*[normalize-space()='" + templateName + "']/ancestor::tr[1]");
-
-		WebElement templateRow = driver.findElement(templateRowLocator);
-
-		WebElement deleteButton = templateRow.findElement(By.xpath(".//button[@title='Delete Template']"));
-
-		elementUtils.click(deleteButton);
-
-		WebElement confirmDelete = driver.findElement(By.xpath("//span[normalize-space()='Yes, Delete Template']"));
-
-		elementUtils.click(confirmDelete);
+	public void clickReject() {
+		elementUtils.click(rejectButton);
 	}
+
+	public void clickSignAndApprove() {
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+
+		wait.until(ExpectedConditions.refreshed(ExpectedConditions.elementToBeClickable(signAndApproveButton))).click();
+	}
+
+	public void closeReviewTab() {
+		String currentWindow = driver.getWindowHandle();
+
+		for (String window : driver.getWindowHandles()) {
+			if (!window.equals(currentWindow)) {
+				driver.switchTo().window(window);
+				driver.close();
+			}
+		}
+
+		driver.switchTo().window(currentWindow);
+	}
+
 }

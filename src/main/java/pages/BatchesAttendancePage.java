@@ -1,6 +1,7 @@
 package pages;
 
 import java.time.Duration;
+import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -50,12 +51,33 @@ public class BatchesAttendancePage {
 
 	@FindBy(xpath = "//input[@id='cohort-seat-capacity']")
 	private WebElement seatCapacity;
+	@FindBy(xpath = "//*[normalize-space()='Selenium Automation Testing']")
+	private WebElement createdBatchNames;
 
 	@FindBy(xpath = "//span[text()='Generate Sessions & Schedule']")
 	private WebElement generateSessionsButton;
 
 	@FindBy(xpath = "(//span[normalize-space()='Cancel'])[1]")
 	private WebElement cancelButton;
+
+	@FindBy(xpath = "//*[normalize-space()='Selenium Automation Testing']")
+	private WebElement createdBatchName;
+
+	@FindBy(xpath = "//tbody/tr[1]")
+	private WebElement rosterMatrixButton;
+
+	@FindBy(xpath = "//p[text()='Tracking attendance across 0 scheduled sessions']")
+	private WebElement rosterMatrixHeading;
+
+	@FindBy(xpath = "(//button[@aria-label='Close modal'])[1]")
+	private WebElement rosterMatrixCloseButton;
+
+	@FindBy(xpath = "//*[contains(normalize-space(),'Scheduled')]" + " | //*[contains(normalize-space(),'Cohort')]"
+			+ " | //*[contains(normalize-space(),'Mon')]")
+	private WebElement batchResult;
+
+	@FindBy(xpath = "//table//tr")
+	private List<WebElement> batchRows;
 
 	public void openBatchesAttendance() {
 
@@ -118,12 +140,48 @@ public class BatchesAttendancePage {
 		elementUtils.click(cancelButton);
 	}
 
-	@FindBy(xpath = "//*[contains(normalize-space(),'Scheduled')]" + " | //*[contains(normalize-space(),'Cohort')]"
-			+ " | //*[contains(normalize-space(),'Mon')]")
-	private WebElement batchResult;
-
 	public boolean isBatchCreated() {
 
 		return elementUtils.isDisplayed(batchResult);
 	}
+
+	public boolean isCreatedBatchDisplayed() {
+		return createdBatchName.isDisplayed();
+	}
+
+	public void clickRosterMatrixForCreatedBatch() {
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+
+		wait.until(ExpectedConditions.elementToBeClickable(rosterMatrixButton));
+
+		elementUtils.click(rosterMatrixButton);
+	}
+
+	public boolean isRosterMatrixDisplayed() {
+		return rosterMatrixHeading.isDisplayed();
+	}
+
+	public void closeRosterMatrix() {
+		elementUtils.click(rosterMatrixCloseButton);
+	}
+
+	public void createCohortBatch() {
+		elementUtils.click(createCohortBatchButton);
+	}
+
+	public boolean isBatchValidationDisplayed(String testCase) {
+		return driver.getPageSource().contains("required");
+	}
+
+	public boolean isCreatedBatchDisplayedInTable() {
+		for (WebElement row : batchRows) {
+			String rowText = row.getText();
+
+			if (rowText != null && rowText.contains("Selenium Automation Testing")) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 }

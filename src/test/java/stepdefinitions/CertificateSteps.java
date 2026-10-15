@@ -27,6 +27,26 @@ public class CertificateSteps {
 				"Certificates & Approvals page is not displayed");
 	}
 
+	@When("user clicks Preview for a certificate")
+	public void userClicksPreviewForACertificate() {
+		certificatePage.clickPreview();
+	}
+
+	@When("user clicks Reject for a certificate")
+	public void userClicksRejectForACertificate() {
+		certificatePage.clickReject();
+	}
+
+	@When("user clicks Sign and Approve for a certificate")
+	public void userClicksSignAndApproveForACertificate() {
+		certificatePage.clickSignAndApprove();
+	}
+
+	@When("user closes the Review tab")
+	public void userClosesTheReviewTab() {
+		certificatePage.closeReviewTab();
+	}
+
 	@Then("Pending Approvals should be displayed")
 	public void pendingApprovalsShouldBeDisplayed() {
 
@@ -61,44 +81,33 @@ public class CertificateSteps {
 		certificatePage.enterSignatory(ConfigReader.getProperty("certificateSignatory"));
 	}
 
-	@When("user leaves certificate template name blank")
-	public void userLeavesCertificateTemplateNameBlank() {
+	@When("user enters certificate details for {string}")
+	public void userEntersCertificateDetailsFor(String testCase) {
 
-		certificatePage.enterTemplateName(ConfigReader.getProperty("blankCertificateTemplateName"));
+		switch (testCase) {
+		case "BlankCertificateTemplate":
+			certificatePage.enterTemplateName(ConfigReader.getProperty("blankCertificateTemplateName"));
+			certificatePage.enterSignatory(ConfigReader.getProperty("certificateSignatoryTitle"));
+			break;
 
-		certificatePage.enterBrandingAccentColor(ConfigReader.getProperty("certificateAccentColor"));
+		case "BlankCertificateSignatory":
+			certificatePage.enterTemplateName(ConfigReader.getProperty("certificateTemplateName"));
+			certificatePage.enterSignatory(ConfigReader.getProperty("blankCertificateSignatory"));
+			break;
 
-		certificatePage.enterSignatory(ConfigReader.getProperty("certificateSignatory"));
-	}
+		case "InvalidCertificateTemplate":
+			certificatePage.enterTemplateName(ConfigReader.getProperty("invalidCertificateTemplateName"));
+			certificatePage.enterSignatory(ConfigReader.getProperty("certificateSignatoryTitle"));
+			break;
 
-	@When("user enters invalid certificate template name")
-	public void userEntersInvalidCertificateTemplateName() {
+		case "InvalidCertificateSignatory":
+			certificatePage.enterTemplateName(ConfigReader.getProperty("certificateTemplateName"));
+			certificatePage.enterSignatory(ConfigReader.getProperty("invalidCertificateSignatory"));
+			break;
 
-		certificatePage.enterTemplateName(ConfigReader.getProperty("invalidCertificateTemplateName"));
-
-		certificatePage.enterBrandingAccentColor(ConfigReader.getProperty("certificateAccentColor"));
-
-		certificatePage.enterSignatory(ConfigReader.getProperty("certificateSignatory"));
-	}
-
-	@When("user leaves certificate signatory blank")
-	public void userLeavesCertificateSignatoryBlank() {
-
-		certificatePage.enterTemplateName(ConfigReader.getProperty("certificateTemplateName"));
-
-		certificatePage.enterBrandingAccentColor(ConfigReader.getProperty("certificateAccentColor"));
-
-		certificatePage.enterSignatory(ConfigReader.getProperty("blankCertificateSignatory"));
-	}
-
-	@When("user enters invalid certificate signatory")
-	public void userEntersInvalidCertificateSignatory() {
-
-		certificatePage.enterTemplateName(ConfigReader.getProperty("certificateTemplateName"));
-
-		certificatePage.enterBrandingAccentColor(ConfigReader.getProperty("certificateAccentColor"));
-
-		certificatePage.enterSignatory(ConfigReader.getProperty("invalidCertificateSignatory"));
+		default:
+			throw new IllegalArgumentException("Unknown certificate test case: " + testCase);
+		}
 	}
 
 	@When("user saves the certificate template")
@@ -110,34 +119,15 @@ public class CertificateSteps {
 	@Then("certificate template should be created successfully")
 	public void certificateTemplateShouldBeCreatedSuccessfully() {
 
-		Assert.assertFalse(certificatePage.isTemplateCreatedSuccessfully(),
+		Assert.assertTrue(certificatePage.isTemplateCreatedSuccessfully(),
 				"Certificate template was not created successfully");
 	}
 
 	@Then("certificate template should not be created")
 	public void certificateTemplateShouldNotBeCreated() {
 
-		Assert.assertTrue(certificatePage.isTemplateCreatedSuccessfully(),
+		Assert.assertFalse(certificatePage.isTemplateCreatedSuccessfully(),
 				"Certificate template was created with invalid data");
 	}
 
-	@When("user edits the configured certificate template")
-	public void userEditsConfiguredCertificateTemplate() {
-
-		certificatePage.editTemplate(
-
-				ConfigReader.getProperty("certificateTemplateName"),
-
-				ConfigReader.getProperty("updatedCertificateTemplateName"),
-
-				ConfigReader.getProperty("updatedCertificateSignatory"));
-	}
-
-	@When("user deletes the configured certificate template")
-	public void userDeletesConfiguredCertificateTemplate() {
-
-		certificatePage.deleteTemplate(
-
-				ConfigReader.getProperty("updatedCertificateTemplateName"));
-	}
 }

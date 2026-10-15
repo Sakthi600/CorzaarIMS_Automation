@@ -95,6 +95,39 @@ public class CouponSteps {
 		couponPage.submitForApproval();
 	}
 
+	@When("user enters invalid coupon details for {string}")
+	public void userEntersInvalidCouponDetailsFor(String testCase) {
+
+		switch (testCase) {
+		case "BlankCouponCode":
+			userLeavesCouponCodeBlank();
+			break;
+
+		case "InvalidCouponCode":
+			userEntersInvalidCouponCode();
+			break;
+
+		case "ZeroCouponDiscount":
+			userEntersZeroCouponDiscount();
+			break;
+
+		case "CouponDiscountAbove100":
+			userEntersCouponDiscountAboveOneHundred();
+			break;
+
+		case "NegativeCouponDiscount":
+			userEntersNegativeCouponDiscount();
+			break;
+
+		case "ZeroCouponUsageLimit":
+			userEntersZeroCouponUsageLimit();
+			break;
+
+		default:
+			throw new IllegalArgumentException("Unknown coupon test case: " + testCase);
+		}
+	}
+
 	@Then("coupon should be submitted for approval")
 	public void couponShouldBeSubmittedForApproval() {
 		Assert.assertTrue(couponPage.isCouponPending(), "Coupon was not submitted for approval");
@@ -106,16 +139,4 @@ public class CouponSteps {
 		Assert.assertTrue(couponPage.isCouponFormStillDisplayed(), "Invalid coupon form should remain displayed");
 	}
 
-	@When("user edits the configured coupon")
-	public void userEditsTheConfiguredCoupon() {
-
-		couponPage.editCoupon(ConfigReader.getProperty("couponCode"), ConfigReader.getProperty("updatedCouponCode"),
-				ConfigReader.getProperty("updatedCouponDiscount"));
-	}
-
-	@When("user deletes the configured coupon")
-	public void userDeletesTheConfiguredCoupon() {
-
-		couponPage.deleteCoupon(ConfigReader.getProperty("updatedCouponCode"));
-	}
 }

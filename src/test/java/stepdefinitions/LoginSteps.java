@@ -19,149 +19,137 @@ public class LoginSteps {
 
 	@Given("user opens the Corzaar IMS merchant login page")
 	public void userOpensMerchantLoginPage() {
-
 		loginPage = new LoginPage(DriverFactory.getDriver());
 		DriverFactory.getDriver().get(ConfigReader.getProperty("baseUrl"));
-
 	}
 
 	@When("user enters the institute mobile number")
 	public void userEntersInstituteMobileNumber() {
-
 		loginPage.enterMobileNumber(ConfigReader.getProperty("instituteMobile"));
-	}
-
-	@When("user enters an invalid institute mobile number")
-	public void userEntersInvalidInstituteMobileNumber() {
-
-		loginPage.enterMobileNumber(ConfigReader.getProperty("invalidInstituteMobile"));
-	}
-
-	@When("user leaves the institute mobile number blank")
-	public void userLeavesInstituteMobileNumberBlank() {
-
-		loginPage.enterMobileNumber(ConfigReader.getProperty("blankInstituteMobile"));
-	}
-
-	@When("user enters an excessive length mobile number")
-	public void userEntersExcessiveLengthMobileNumber() {
-
-		loginPage.enterMobileNumber(ConfigReader.getProperty("excessMobile"));
 	}
 
 	@When("user enters the institute contact person name")
 	public void userEntersInstituteContactPersonName() {
-
 		loginPage.enterContactPerson(ConfigReader.getProperty("instituteContact"));
 	}
 
-	@When("user enters an invalid institute contact person name")
-	public void userEntersInvalidInstituteContactPersonName() {
-
-		loginPage.enterContactPerson(ConfigReader.getProperty("invalidInstituteContact"));
-	}
-
-	@When("user leaves the institute contact person name blank")
-	public void userLeavesInstituteContactPersonNameBlank() {
-
-		loginPage.enterContactPerson(ConfigReader.getProperty("blankInstituteContact"));
-	}
-
-	@When("user enters an excessive length contact person name")
-	public void userEntersExcessiveLengthContactPersonName() {
-
-		loginPage.enterContactPerson(ConfigReader.getProperty("excessContact"));
-	}
-
 	@When("user clicks on Send Institute Verification Code")
-	public void userClicksSendInstituteVerificationCode() {
-
+	public void userClicksOnSendInstituteVerificationCode() {
 		loginPage.clickSendVerificationCode();
-
-		otpPage = new OtpPage(DriverFactory.getDriver());
 	}
 
 	@Then("OTP verification page should be displayed")
 	public void otpVerificationPageShouldBeDisplayed() {
+		otpPage = new OtpPage(DriverFactory.getDriver());
 
 		Assert.assertTrue(otpPage.isOtpVerificationPageDisplayed(), "OTP verification page was not displayed");
 	}
 
-	@Then("OTP verification page should not be displayed")
-	public void otpVerificationPageShouldNotBeDisplayed() {
-
-		Assert.assertFalse(otpPage.isOtpVerificationPageDisplayed(),
-				"OTP verification page was displayed for invalid login data");
-	}
-
 	@When("user enters the valid OTP")
-	public void userEntersValidOtp() {
-
+	public void userEntersTheValidOTP() {
 		otpPage.enterOtp(ConfigReader.getProperty("otp"));
 	}
 
-	@When("user enters an invalid OTP")
-	public void userEntersInvalidOtp() {
-
-		otpPage.enterOtp(ConfigReader.getProperty("invalidOtp"));
-	}
-
-	@When("user leaves the OTP field blank")
-	public void userLeavesOtpFieldBlank() {
-
-		otpPage.enterOtp(ConfigReader.getProperty("blankOtp"));
-	}
-
 	@When("user clicks on Verify and Enter Merchant Studio")
-	public void userClicksVerifyAndEnterMerchantStudio() {
-
+	public void userClicksOnVerifyAndEnterMerchantStudio() {
 		otpPage.clickVerify();
-
-		dashboardPage = new MerchantDashboardPage(DriverFactory.getDriver());
 	}
 
 	@Then("Merchant Studio dashboard should be displayed")
 	public void merchantStudioDashboardShouldBeDisplayed() {
+		dashboardPage = new MerchantDashboardPage(DriverFactory.getDriver());
 
-		Assert.assertTrue(dashboardPage.isDashboardDisplayed(), "Merchant Studio Dashboard was not displayed");
-	}
-
-	@Then("Merchant Studio dashboard should not be displayed")
-	public void merchantStudioDashboardShouldNotBeDisplayed() {
-
-		Assert.assertFalse(dashboardPage.isDashboardDisplayed(),
-				"Merchant Studio Dashboard was displayed for invalid OTP");
+		Assert.assertTrue(dashboardPage.isDashboardDisplayed(), "Merchant Studio dashboard was not displayed");
 	}
 
 	@Then("Overview menu should be displayed")
 	public void overviewMenuShouldBeDisplayed() {
-
-		Assert.assertTrue(dashboardPage.isOverviewDisplayed(), "Overview menu is not displayed");
+		Assert.assertTrue(dashboardPage.isOverviewDisplayed(), "Overview menu was not displayed");
 	}
 
 	@Then("My Institute should be displayed")
 	public void myInstituteShouldBeDisplayed() {
-
-		Assert.assertTrue(dashboardPage.isMyInstituteDisplayed(), "My Institute is not displayed");
+		Assert.assertTrue(dashboardPage.isMyInstituteDisplayed(), "My Institute was not displayed");
 	}
 
 	@Then("dashboard summary should be displayed")
 	public void dashboardSummaryShouldBeDisplayed() {
-
-		Assert.assertTrue(dashboardPage.isDashboardDataDisplayed(), "Dashboard summary is not displayed");
+		Assert.assertTrue(dashboardPage.isDashboardDataDisplayed(), "Dashboard summary was not displayed");
 	}
 
-	@When("user clicks Sign out")
-	public void userClicksSignOut() {
+	@When("user executes login negative case {string} using mobile key {string} and OTP key {string}")
+	public void executeLoginNegativeCase(String testType, String mobileKey, String otpKey) {
 
+		String mobile = ConfigReader.getProperty(mobileKey);
 		loginPage = new LoginPage(DriverFactory.getDriver());
-		loginPage.clickSignOut();
+
+		switch (testType) {
+		case "blank_mobile":
+		case "alphabet":
+		case "special_char":
+		case "short_mobile":
+		case "long_mobile":
+			loginPage.enterMobileNumber(mobile == null ? "" : mobile);
+			loginPage.clickSendVerificationCode();
+			break;
+
+		case "alphabet_otp":
+		case "invalid_otp":
+			loginPage.enterMobileNumber(mobile);
+			loginPage.enterContactPerson(ConfigReader.getProperty("instituteContact"));
+			loginPage.clickSendVerificationCode();
+
+			otpPage = new OtpPage(DriverFactory.getDriver());
+			otpPage.enterOtp(ConfigReader.getProperty(otpKey));
+			otpPage.clickVerify();
+			break;
+
+		case "change_mobile":
+			loginPage.enterMobileNumber(mobile);
+			loginPage.enterContactPerson(ConfigReader.getProperty("instituteContact"));
+			loginPage.clickSendVerificationCode();
+
+			otpPage = new OtpPage(DriverFactory.getDriver());
+			Assert.assertTrue(otpPage.isOtpVerificationPageDisplayed(), "OTP page was not displayed");
+			loginPage.clickChangeButton();
+			loginPage.enterMobileNumber(ConfigReader.getProperty("changedMobile"));
+			break;
+
+		default:
+			throw new IllegalArgumentException("Unknown login test type: " + testType);
+		}
 	}
 
-	@Then("user should be logged out successfully")
-	public void userShouldBeLoggedOutSuccessfully() {
-		Assert.assertTrue(DriverFactory.getDriver().getCurrentUrl().contains("login"),
-				"User was not redirected to Login page after Sign out");
+	@Then("login negative case {string} should be validated")
+	public void validateLoginNegativeCase(String testType) {
+		switch (testType) {
+		case "blank_mobile":
+			Assert.assertFalse(new OtpPage(DriverFactory.getDriver()).isOtpVerificationPageDisplayed(),
+					"OTP page should not open for blank mobile");
+			break;
+
+		case "alphabet":
+		case "special_char":
+		case "short_mobile":
+		case "long_mobile":
+			Assert.assertFalse(new OtpPage(DriverFactory.getDriver()).isOtpVerificationPageDisplayed(),
+					"OTP page should not open for invalid mobile");
+			break;
+
+		case "alphabet_otp":
+		case "invalid_otp":
+			Assert.assertTrue(new OtpPage(DriverFactory.getDriver()).isInvalidOtpMessageDisplayed(),
+					"Expected invalid OTP error was not displayed");
+			break;
+
+		case "change_mobile":
+			Assert.assertEquals(loginPage.getMobileNumberValue(), ConfigReader.getProperty("changedMobile"),
+					"Changed mobile number was not displayed");
+			break;
+
+		default:
+			throw new IllegalArgumentException("Unknown login test type: " + testType);
+		}
 	}
 
 }
