@@ -67,16 +67,6 @@ public class CouponsPage {
 		elementUtils.fillValue(discountPercentage, discount);
 	}
 
-	// =========================================================
-	// USAGE LIMIT
-	// =========================================================
-
-	/*
-	 * public void enterUsageLimit(String limit) {
-	 * 
-	 * elementUtils.fillValue(usageLimit, limit); }
-	 */
-
 	public void submitForApproval() {
 
 		elementUtils.click(submitApprovalButton);
@@ -102,37 +92,4 @@ public class CouponsPage {
 		}
 	}
 
-	public void editCoupon(String existingCode, String updatedCode, String updatedDiscount) {
-
-		By couponRowLocator = By.xpath("//*[normalize-space()='" + existingCode + "']/ancestor::tr[1]");
-
-		WebElement couponRow = driver.findElement(couponRowLocator);
-
-		WebElement editButton = couponRow.findElement(By.xpath(".//button[@title='Edit Coupon']"));
-
-		elementUtils.click(editButton);
-
-		elementUtils.fillValue(couponCode, updatedCode);
-
-		elementUtils.fillValue(discountPercentage, updatedDiscount);
-
-		WebElement saveButton = driver.findElement(By.xpath("(//button[@type='submit'])[1]"));
-
-		elementUtils.click(saveButton);
-	}
-
-	public void deleteCoupon(String couponCodeValue) {
-
-		By couponRowLocator = By.xpath("//*[normalize-space()='" + couponCodeValue + "']/ancestor::tr[1]");
-
-		WebElement couponRow = driver.findElement(couponRowLocator);
-
-		WebElement deleteButton = couponRow.findElement(By.xpath(".//button[@title='Delete Coupon']"));
-
-		elementUtils.click(deleteButton);
-
-		WebElement confirmDelete = driver.findElement(By.xpath("//span[normalize-space()='Yes, Delete Coupon']"));
-
-		elementUtils.click(confirmDelete);
-	}
 }

@@ -9,6 +9,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import utils.ElementUtils;
@@ -51,6 +52,7 @@ public class BatchesAttendancePage {
 
 	@FindBy(xpath = "//input[@id='cohort-seat-capacity']")
 	private WebElement seatCapacity;
+	
 	@FindBy(xpath = "//*[normalize-space()='Selenium Automation Testing']")
 	private WebElement createdBatchNames;
 
@@ -63,10 +65,10 @@ public class BatchesAttendancePage {
 	@FindBy(xpath = "//*[normalize-space()='Selenium Automation Testing']")
 	private WebElement createdBatchName;
 
-	@FindBy(xpath = "//tbody/tr[1]")
+	@FindBy(xpath = "(//span[contains(text(),'Roster Matrix')])[1]")
 	private WebElement rosterMatrixButton;
 
-	@FindBy(xpath = "//p[text()='Tracking attendance across 0 scheduled sessions']")
+	@FindBy(xpath = "(//th[@class='px-6 py-4 whitespace-nowrap text-right'])[1]")
 	private WebElement rosterMatrixHeading;
 
 	@FindBy(xpath = "(//button[@aria-label='Close modal'])[1]")
@@ -76,8 +78,11 @@ public class BatchesAttendancePage {
 			+ " | //*[contains(normalize-space(),'Mon')]")
 	private WebElement batchResult;
 
-	@FindBy(xpath = "//table//tr")
+	@FindBy(xpath = "//table//tbody/tr")
 	private List<WebElement> batchRows;
+
+	@FindBy(xpath = "//table/tbody/tr/td[1]")
+	private List<WebElement> batchNameElements;
 
 	public void openBatchesAttendance() {
 
@@ -89,16 +94,15 @@ public class BatchesAttendancePage {
 		elementUtils.click(createCohortBatchButton);
 	}
 
-	public void selectCourse(String courseName) {
+	public void selectCourse(int index) {
 
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
-		wait.until(ExpectedConditions.elementToBeClickable(selectCourseDropdown)).click();
+		wait.until(ExpectedConditions.elementToBeClickable(selectCourseDropdown));
 
-		WebElement courseOption = wait.until(ExpectedConditions
-				.elementToBeClickable(By.xpath("//option[@value='f8ff4b74-86a6-49f7-a731-61e9c654863d']")));
+		Select select = new Select(selectCourseDropdown);
+		select.selectByIndex(index);
 
-		courseOption.click();
 	}
 
 	public void enterCoordinator(String name) {
@@ -173,15 +177,44 @@ public class BatchesAttendancePage {
 		return driver.getPageSource().contains("required");
 	}
 
-	public boolean isCreatedBatchDisplayedInTable() {
-		for (WebElement row : batchRows) {
-			String rowText = row.getText();
+	public boolean isBatchDisplayed(String batchName) {
 
-			if (rowText != null && rowText.contains("Selenium Automation Testing")) {
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+
+		wait.until(ExpectedConditions.visibilityOfAllElements(batchRows));
+
+		for (WebElement row : batchRows) {
+
+			String rowText = row.getText().trim();
+			System.out.println("Table Row: " + rowText);
+
+			if (rowText.toLowerCase().contains(batchName.trim().toLowerCase())) {
+				System.out.println("Matched Batch: " + rowText);
 				return true;
 			}
 		}
+
+		System.out.println("Batch not found: " + batchName);
 		return false;
+	}
+
+	public String getCreatedBatchName() {
+
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+
+		wait.until(ExpectedConditions.visibilityOfAllElements(batchRows));
+
+		for (int i = 0; i < batchNameElements.size(); i++) {
+
+			String batchName = batchNameElements.get(i).getText().trim();
+
+			if (!batchName.isEmpty()) {
+				System.out.println("Batch Name: " + batchName);
+				return batchName;
+			}
+		}
+
+		throw new RuntimeException("No batch name found in the table");
 	}
 
 }

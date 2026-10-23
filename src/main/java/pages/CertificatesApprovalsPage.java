@@ -83,6 +83,9 @@ public class CertificatesApprovalsPage {
 
 	@FindBy(xpath = "(//span[contains(text(),'Sign & Approve')])[1]")
 	private WebElement signAndApproveButton;
+	
+	@FindBy(xpath = "(//h4[normalize-space()='Template Created'])[1]")
+	private WebElement templateSuccessMessage;
 
 	public void openCertificatesApprovals() {
 
@@ -162,9 +165,6 @@ public class CertificatesApprovalsPage {
 	public void clickCancel() {
 		elementUtils.click(cancelButton);
 	}
-
-	@FindBy(xpath = "(//h4[normalize-space()='Template Created'])[1]")
-	private WebElement templateSuccessMessage;
 
 	public boolean isTemplateCreatedSuccessfully() {
 		try {

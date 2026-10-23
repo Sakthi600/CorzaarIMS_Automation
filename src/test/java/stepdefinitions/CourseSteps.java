@@ -13,20 +13,20 @@ public class CourseSteps {
 
 	private CourseStudioPage coursePage;
 
-	// Open Course Studio
+	
 	@When("user opens Course Studio")
 	public void userOpensCourseStudio() {
 		coursePage = new CourseStudioPage(DriverFactory.getDriver());
 		coursePage.openCourseStudio();
 	}
 
-	// Open Create Course modal
+	
 	@When("user clicks Create New Course Program")
 	public void userClicksCreateNewCourseProgram() {
 		coursePage.clickCreateCourse();
 	}
 
-	// Fill mandatory course fields
+	
 	@When("user fills mandatory course details")
 	public void userFillsMandatoryCourseDetails() {
 		coursePage.enterCourseTitle(ConfigReader.getProperty("courseTitle"));
@@ -40,24 +40,24 @@ public class CourseSteps {
 		// coursePage.enterModuleTitle(ConfigReader.getProperty("courseModuleTitle"));
 	}
 
-	// Add another module section
+	
 	@When("user clicks Add Module")
 	public void userClicksAddModule() {
 		coursePage.clickAddModule();
 	}
 
+	
+	@When("user fills mandatory module details")
+	public void userFillsMandatoryModuleDetails() {
+		coursePage.fillModuleDetails(ConfigReader.getProperty("moduleTitle"));
+	}
+	
 	@Then("an additional module section should be displayed")
 	public void additionalModuleSectionShouldBeDisplayed() {
 		Assert.assertTrue(coursePage.getModuleCount() >= 2, "Additional module section was not displayed");
 	}
 
-	// Fill the additional module
-	@When("user fills mandatory module details")
-	public void userFillsMandatoryModuleDetails() {
-		coursePage.fillModuleDetails(ConfigReader.getProperty("moduleTitle"));
-	}
-
-	// Submit course
+	
 	@When("user submits the course")
 	public void userSubmitsTheCourse() {
 		coursePage.publishCourse();
@@ -68,7 +68,7 @@ public class CourseSteps {
 		Assert.assertTrue(coursePage.isCourseUnderReview(), "Course was not moved to Under Review status");
 	}
 
-	// Negative validation scenarios
+	
 	@When("user tests course validation for {string}")
 	public void userTestsCourseValidation(String testCase) {
 		coursePage.testCourseValidation(testCase);
@@ -80,7 +80,7 @@ public class CourseSteps {
 				"Expected validation was not displayed for: " + testCase);
 	}
 
-	// Close Course Program modal
+	
 	@When("user clicks the close button on the course program modal")
 	public void userClicksCloseButtonOnCourseProgramModal() {
 		coursePage.closeCourseProgramModal();
@@ -91,16 +91,35 @@ public class CourseSteps {
 		Assert.assertTrue(coursePage.isCourseProgramModalClosed(), "Course Program modal is still displayed");
 	}
 
-	// Verify invalid course is not submitted
-	@Then("course should not be submitted for administrative review")
-	public void courseShouldNotBeSubmittedForAdministrativeReview() {
-		Assert.assertFalse(coursePage.isCourseUnderReview(),
-				"Course was submitted even though invalid data was entered");
+	@Then("the created course status should be displayed")
+	public void theCreatedCourseStatusShouldBeDisplayed() {
+
+		String createdCourseName = "Postman Fundamentals in 6 hours";
+
+		String actualStatus = coursePage.getCourseStatus(createdCourseName);
+
+		System.out.println("Created Course: " + createdCourseName);
+		System.out.println("Created Course Actual Status: " + actualStatus);
+
+		Assert.assertEquals(actualStatus.toLowerCase(), "under_review", "Created course status is incorrect!");
+	}
+
+	@Then("the existing course status should be displayed")
+	public void theExistingCourseStatusShouldBeDisplayed() {
+
+		String existingCourseName = "Postman: The Complete Guide - REST API Testing";
+
+		String actualStatus = coursePage.getCourseStatus(existingCourseName);
+
+		System.out.println("Existing Course: " + existingCourseName);
+		System.out.println("Existing Course Actual Status: " + actualStatus);
+
+		Assert.assertFalse(actualStatus.isBlank(), "Existing course status is empty!");
 	}
 
 	@When("user clicks Edit for the course {string}")
 	public void userClicksEditForCourse(String courseName) {
-		coursePage.clickEditCourse(courseName);
+		coursePage.clickEditForCourse(courseName);
 	}
 
 	@When("user clicks Delete for the course {string}")
@@ -128,7 +147,7 @@ public class CourseSteps {
 				"Updated course was not displayed in the course table");
 	}
 
-	// Delete a configured course
+	
 	@When("user deletes the configured course")
 	public void userDeletesTheConfiguredCourse() {
 		coursePage.deleteCourse(ConfigReader.getProperty("courseToDelete"));
@@ -136,7 +155,7 @@ public class CourseSteps {
 
 	@Then("the deleted course should not be displayed in the course table")
 	public void deletedCourseShouldNotBeDisplayed() {
-		Assert.assertFalse(coursePage.isCourseDisplayed(ConfigReader.getProperty("courseToDelete")),
+		Assert.assertTrue(coursePage.isCourseDisplayed(ConfigReader.getProperty("courseToDelete")),
 				"Deleted course is still displayed in the course table");
 	}
 

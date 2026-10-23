@@ -1,6 +1,6 @@
-
 package pages;
 
+import java.time.Duration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,8 +13,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import utils.ElementUtils;
 
-import java.time.Duration;
-
 public class OverviewPage {
 
 	private WebDriver driver;
@@ -25,35 +23,47 @@ public class OverviewPage {
 		this.driver = driver;
 		this.wait = new WebDriverWait(driver, Duration.ofSeconds(15));
 		this.elementUtils = new ElementUtils(driver);
+
 		PageFactory.initElements(driver, this);
 	}
 
-	@FindBy(xpath = "//*[normalize-space()='Overview']")
+	
+	@FindBy(xpath = "(//span[normalize-space()='Overview'])[1]")
 	private WebElement overviewHeading;
 
-	@FindBy(xpath = "(//span[contains(text(),'₹0')])[1]")
+	
+	@FindBy(xpath = "(//span[normalize-space()='Total Revenue'])[1]")
+	private WebElement totalRevenueLabel;
+	@FindBy(xpath = "//*[normalize-space()='Published Courses']/following::span[1]")
+	private WebElement publishedCoursesLabel;
+
+	@FindBy(xpath = "(//*[contains(normalize-space(.),' in review')])[10]")
+	private WebElement coursesInReviewLabel;
+
+	@FindBy(xpath = "//*[normalize-space()='Cohort Batches']/following::span[1]")
+	private WebElement cohortBatchesLabel;
+
+	@FindBy(xpath = "//*[normalize-space()='Student Enrollments']/following::span[1]")
+	private WebElement studentEnrollmentsValue;
+
+	@FindBy(xpath = "(//span[normalize-space()='Total Revenue'])[1]")
 	private WebElement totalRevenueCard;
-
-	@FindBy(xpath = "(//span[normalize-space()='2'])[1]")
-	private WebElement studentEnrollmentsCard;
-
-	@FindBy(xpath = "(//span[normalize-space()='3'])[1]")
-	private WebElement publishedCoursesCard;
-
-	@FindBy(xpath = "(//span[normalize-space()='25'])[1]")
-	private WebElement cohortBatchesCard;
-
-	@FindBy(xpath = "(//span[normalize-space()='0 in review'])[1]")
-	private WebElement reviewText;
-
-	@FindBy(xpath = "(//span[@class='inline-flex items-center gap-1 shrink-0 bg-rose-50 text-rose-700 border-rose-200 text-xs px-2.5 py-1 font-medium border rounded-full'])[1]")
-	private WebElement rejectedStatus;
-
+	
 	@FindBy(xpath = "(//p[@class='text-xs sm:text-sm text-ink-muted dark:text-dark-ink-muted mt-1'])[1]")
 	private WebElement accreditationPending;
-
+	
+	@FindBy(xpath = "(//h1[normalize-space()='My Institute'])[1]")
+	private WebElement instituteName;
+	
+	@FindBy(xpath = "(//h1[normalize-space()='Course Studio'])[1]")
+	private WebElement courseStudioHeading;
+	
+	@FindBy(xpath = "(//h1[normalize-space()='Batches & Attendance'])[1]")
+	private WebElement batchesAttendanceHeading;
+	
 	@FindBy(xpath = "(//h1[normalize-space()='My Institute'])[1]")
 	private WebElement myInstituteHeading;
+
 
 	@FindBy(xpath = "(//span[normalize-space()='Create Course'])[1]")
 	private WebElement createCourseButton;
@@ -61,62 +71,9 @@ public class OverviewPage {
 	@FindBy(xpath = "(//span[normalize-space()='Add Batch'])[1]")
 	private WebElement addBatchButton;
 
-	@FindBy(xpath = "(//h1[normalize-space()='Course Studio'])[1]")
-	private WebElement courseStudioHeading;
 	
-	@FindBy(xpath = "(//span[normalize-space()='Overview'])[1]")
-	private WebElement overview;
-
-	@FindBy(xpath = "(//h1[normalize-space()='Batches & Attendance'])[1]")
-	private WebElement batchesAttendanceHeading;
-
-// Update this locator to the actual institute name shown on the dashboard.
-	@FindBy(xpath = "//*[normalize-space()='EXPECTED_INSTITUTE_NAME']")
-	private WebElement instituteName;
-
-	public boolean isOverviewDisplayed() {
-		return wait.until(ExpectedConditions.visibilityOf(overviewHeading)).isDisplayed();
-	}
-
-	public boolean isTotalRevenueDisplayed() {
-		String text = wait.until(ExpectedConditions.visibilityOf(totalRevenueCard)).getText();
-
-		return text.replace("TOTAL REVENUE", "").trim().length() > 0;
-	}
-
-	public int getConfirmedPaidLearnersCount() {
-		return extractFirstNumber(wait.until(ExpectedConditions.visibilityOf(studentEnrollmentsCard)).getText());
-	}
-
-	public int getPublishedCoursesCount() {
-		String text = wait.until(ExpectedConditions.visibilityOf(publishedCoursesCard)).getText();
-
-		System.out.println("Published Courses Card Text: " + text);
-
-		Matcher matcher = Pattern.compile("\\b3\\b").matcher(text);
-
-		if (matcher.find()) {
-			return Integer.parseInt(matcher.group());
-		}
-
-		throw new AssertionError("Published Courses count not found in card text: " + text);
-	}
-
-	public int getCoursesInReviewCount() {
-
-		String text = reviewText.getText();
-
-		Matcher matcher = Pattern.compile("(\\d+)\\s*in\\s*review", Pattern.CASE_INSENSITIVE).matcher(text);
-
-		if (matcher.find()) {
-			return Integer.parseInt(matcher.group(1));
-		}
-
-		throw new AssertionError("Courses In Review count not found. Actual text: " + text);
-	}
-
-	public int getAttendanceTrackingCount() {
-		return extractFirstNumber(wait.until(ExpectedConditions.visibilityOf(cohortBatchesCard)).getText());
+	private String getVisibleText(WebElement element) {
+		return wait.until(ExpectedConditions.visibilityOf(element)).getText().trim();
 	}
 
 	private int extractFirstNumber(String text) {
@@ -126,23 +83,60 @@ public class OverviewPage {
 			return Integer.parseInt(matcher.group());
 		}
 
-		throw new AssertionError("Numeric value not found: " + text);
+		throw new AssertionError("Number not found in UI text: " + text);
 	}
 
-	public boolean isRejected() {
-		return wait.until(ExpectedConditions.visibilityOf(rejectedStatus)).isDisplayed();
+	
+	public boolean isTotalRevenueDisplayed() {
+		return wait.until(ExpectedConditions.visibilityOf(totalRevenueCard)).isDisplayed();
 	}
 
-	public boolean isAccreditationPending() {
-		return wait.until(ExpectedConditions.visibilityOf(accreditationPending)).isDisplayed();
+	public String getTotalRevenueText() {
+		return wait.until(ExpectedConditions.visibilityOf(totalRevenueCard)).getText();
 	}
 
 	public boolean isMyInstituteDisplayed() {
 		return wait.until(ExpectedConditions.visibilityOf(myInstituteHeading)).isDisplayed();
 	}
 
+	public boolean isAccreditationPending() {
+		return wait.until(ExpectedConditions.visibilityOf(accreditationPending)).isDisplayed();
+	}
+
 	public boolean isExpectedInstituteDisplayed() {
 		return wait.until(ExpectedConditions.visibilityOf(instituteName)).isDisplayed();
+	}
+
+	public boolean isCourseStudioPageDisplayed() {
+		return wait.until(ExpectedConditions.visibilityOf(courseStudioHeading)).isDisplayed();
+	}
+
+	public boolean isBatchesAttendancePageDisplayed() {
+		return wait.until(ExpectedConditions.visibilityOf(batchesAttendanceHeading)).isDisplayed();
+	}
+
+	public boolean isOverviewDisplayed() {
+		return wait.until(ExpectedConditions.visibilityOf(overviewHeading)).isDisplayed();
+	}
+
+	public int getStudentEnrollmentsCount() {
+		String text = wait.until(ExpectedConditions.visibilityOf(studentEnrollmentsValue)).getText().trim();
+		
+		System.out.println("Student Enrollments value: " + text);
+		
+		return extractFirstNumber(text);
+	}
+
+	public int getPublishedCoursesCount() {
+		return extractFirstNumber(getVisibleText(publishedCoursesLabel));
+	}
+
+	public int getCoursesInReviewCount() {
+		return extractFirstNumber(getVisibleText(coursesInReviewLabel));
+	}
+
+	public int getAttendanceTrackingCount() {
+		return extractFirstNumber(getVisibleText(cohortBatchesLabel));
 	}
 
 	public boolean isCreateCourseDisplayed() {
@@ -157,20 +151,11 @@ public class OverviewPage {
 		elementUtils.click(createCourseButton);
 	}
 
-	public boolean isCourseStudioPageDisplayed() {
-		return elementUtils.isDisplayed(courseStudioHeading);
-	}
-	
-	public void clickOverviewMenu() {
-		elementUtils.click(overview);
-	}
-
 	public void clickAddBatch() {
 		elementUtils.click(addBatchButton);
 	}
 
-	public boolean isBatchesAttendancePageDisplayed() {
-		return elementUtils.isDisplayed(batchesAttendanceHeading);
+	public void clickOverview() {
+		elementUtils.click(overviewHeading);
 	}
-
 }

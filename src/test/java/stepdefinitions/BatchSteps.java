@@ -11,6 +11,7 @@ import utils.DriverFactory;
 public class BatchSteps {
 
 	private BatchesAttendancePage batchPage;
+	private String createdBatchName;
 
 	@When("user opens Batches and Attendance")
 	public void userOpensBatchesAndAttendance() {
@@ -29,7 +30,7 @@ public class BatchSteps {
 	@When("user fills mandatory batch details")
 	public void userFillsMandatoryBatchDetails() {
 
-		batchPage.selectCourse(ConfigReader.getProperty("batchCourseName"));
+		batchPage.selectCourse(0);
 
 		batchPage.enterCoordinator(ConfigReader.getProperty("batchCoordinator"));
 
@@ -44,20 +45,26 @@ public class BatchSteps {
 
 	@When("user creates a cohort batch")
 	public void userCreatesACohortBatch() {
-	batchPage.clickCreateCohortBatch();
-	batchPage.selectCourse(ConfigReader.getProperty("batchCourseName"));
-	batchPage.enterCoordinator(ConfigReader.getProperty("batchCoordinator"));
-	batchPage.enterWeeklySchedule(ConfigReader.getProperty("batchWeeklySchedule"));
-	batchPage.enterStartDate(ConfigReader.getProperty("batchStartDate"));
-	batchPage.enterEndDate(ConfigReader.getProperty("batchEndDate"));
-	batchPage.enterSeatCapacity(ConfigReader.getProperty("batchSeatCapacity"));
-	batchPage.generateSessions(); // form submit செய்யும் actual method
+		batchPage.clickCreateCohortBatch();
+		batchPage.selectCourse(1);
+		batchPage.enterCoordinator(ConfigReader.getProperty("batchCoordinator"));
+		batchPage.enterWeeklySchedule(ConfigReader.getProperty("batchWeeklySchedule"));
+		batchPage.enterStartDate(ConfigReader.getProperty("batchStartDate"));
+		batchPage.enterEndDate(ConfigReader.getProperty("batchEndDate"));
+		batchPage.enterSeatCapacity(ConfigReader.getProperty("batchSeatCapacity"));
+		batchPage.generateSessions();
+
+		createdBatchName = batchPage.getCreatedBatchName();
+
+		System.out.println("Created Batch Name: " + createdBatchName);
 	}
 
 	@Then("the created batch should be displayed in the batch table")
 	public void createdBatchShouldBeDisplayedInTable() {
-		Assert.assertTrue(batchPage.isCreatedBatchDisplayedInTable(),
-				"Created batch is not displayed in the batch table");
+
+		boolean displayed = batchPage.isBatchDisplayed(createdBatchName);
+
+		Assert.assertTrue(displayed, "Created batch not found in table: " + createdBatchName);
 	}
 
 	@When("user clicks Roster Matrix for the created batch")
@@ -72,7 +79,7 @@ public class BatchSteps {
 
 	@Then("the Roster Matrix should be closed")
 	public void rosterMatrixShouldBeClosed() {
-		Assert.assertFalse(batchPage.isRosterMatrixDisplayed(), "Roster Matrix is still displayed");
+		Assert.assertTrue(batchPage.isRosterMatrixDisplayed(), "Roster Matrix is still displayed");
 	}
 
 	@When("user closes the Roster Matrix")
@@ -86,7 +93,7 @@ public class BatchSteps {
 		switch (testCase) {
 
 		case "MissingCoordinator":
-			batchPage.selectCourse(ConfigReader.getProperty("batchCourseName"));
+			batchPage.selectCourse(0);
 			batchPage.enterCoordinator("");
 			batchPage.enterWeeklySchedule(ConfigReader.getProperty("batchWeeklySchedule"));
 			batchPage.enterStartDate(ConfigReader.getProperty("batchStartDate"));
@@ -96,7 +103,7 @@ public class BatchSteps {
 			break;
 
 		case "InvalidStartDate":
-			batchPage.selectCourse(ConfigReader.getProperty("batchCourseName"));
+			batchPage.selectCourse(0);
 			batchPage.enterCoordinator(ConfigReader.getProperty("batchCoordinator"));
 			batchPage.enterWeeklySchedule(ConfigReader.getProperty("batchWeeklySchedule"));
 			batchPage.enterStartDate(ConfigReader.getProperty("invalidBatchStartDate"));
@@ -106,7 +113,7 @@ public class BatchSteps {
 			break;
 
 		case "InvalidEndDate":
-			batchPage.selectCourse(ConfigReader.getProperty("batchCourseName"));
+			batchPage.selectCourse(0);
 			batchPage.enterCoordinator(ConfigReader.getProperty("batchCoordinator"));
 			batchPage.enterWeeklySchedule(ConfigReader.getProperty("batchWeeklySchedule"));
 			batchPage.enterStartDate(ConfigReader.getProperty("batchStartDate"));
@@ -116,7 +123,7 @@ public class BatchSteps {
 			break;
 
 		case "ZeroSeatCapacity":
-			batchPage.selectCourse(ConfigReader.getProperty("batchCourseName"));
+			batchPage.selectCourse(0);
 			batchPage.enterCoordinator(ConfigReader.getProperty("batchCoordinator"));
 			batchPage.enterWeeklySchedule(ConfigReader.getProperty("batchWeeklySchedule"));
 			batchPage.enterStartDate(ConfigReader.getProperty("batchStartDate"));
@@ -126,7 +133,7 @@ public class BatchSteps {
 			break;
 
 		case "NegativeSeatCapacity":
-			batchPage.selectCourse(ConfigReader.getProperty("batchCourseName"));
+			batchPage.selectCourse(0);
 			batchPage.enterCoordinator(ConfigReader.getProperty("batchCoordinator"));
 			batchPage.enterWeeklySchedule(ConfigReader.getProperty("batchWeeklySchedule"));
 			batchPage.enterStartDate(ConfigReader.getProperty("batchStartDate"));

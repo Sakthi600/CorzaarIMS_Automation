@@ -4,7 +4,7 @@ I want to login into Merchant Studio
 So that I can access the institute dashboard
 
 
-  @login @positive
+ @merchant @login @positive
   Scenario: Successful Institute Partner Login
     Given user opens the Corzaar IMS merchant login page
     When user enters the institute mobile number
@@ -18,7 +18,7 @@ So that I can access the institute dashboard
     And My Institute should be displayed
     And dashboard summary should be displayed
 
-  @login @negative
+ @merchant @login @negative
   Scenario Outline: Validate negative login and OTP cases
     Given user opens the Corzaar IMS merchant login page
     When user executes login negative case "<testType>" using mobile key "<mobileKey>" and OTP key "<otpKey>"

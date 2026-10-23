@@ -1,9 +1,11 @@
 package pages;
 
 import java.time.Duration;
+
 import java.util.List;
 
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -69,7 +71,6 @@ public class CourseStudioPage {
 	@FindBy(id = "module-1-title")
 	private WebElement moduleTitleField;
 
-	// Replace these example locators with actual HTML attributes
 	@FindBy(id = "module-1-description")
 	private WebElement moduleDescriptionField;
 
@@ -89,14 +90,23 @@ public class CourseStudioPage {
 	@FindBy(xpath = "//button[@type='submit']")
 	private WebElement saveButton;
 
+	@FindBy(id = "course-program-modal")
+	private WebElement courseProgramModal;
+
 	@FindBy(xpath = "//span[normalize-space()='Yes, Delete Course']")
 	private WebElement confirmDeleteButton;
 
 	@FindBy(xpath = "//button[@title='Delete Course']")
 	private List<WebElement> deleteCourseButtons;
 
-	@FindBy(xpath = "//table//tr")
+	@FindBy(xpath = "//table//tbody/tr")
 	private List<WebElement> courseRows;
+
+	@FindBy(xpath = "//table//tbody/tr/td[1]")
+	private List<WebElement> courseNameElements;
+
+	@FindBy(xpath = "//table//tbody/tr/td[4]")
+	private List<WebElement> courseStatusElements;
 
 	@FindBy(xpath = ".//button[@title='Delete Course']")
 	private List<WebElement> buttons;
@@ -199,13 +209,19 @@ public class CourseStudioPage {
 	}
 
 	public void closeCourseProgramModal() {
+
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+
+		// Wait until the close button is clickable
 		wait.until(ExpectedConditions.elementToBeClickable(courseModalCloseButton)).click();
 
-		wait.until(ExpectedConditions.invisibilityOf(moduleTitleField));
+		// Wait until the actual modal is closed
+		wait.until(ExpectedConditions.invisibilityOf(courseProgramModal));
 	}
 
 	public boolean isCourseProgramModalClosed() {
-		return wait.until(ExpectedConditions.invisibilityOf(moduleTitleField));
+		return new WebDriverWait(driver, Duration.ofSeconds(10))
+				.until(ExpectedConditions.invisibilityOf(courseProgramModal));
 	}
 
 	public boolean isValidationDisplayed(String testCase) {
@@ -247,13 +263,22 @@ public class CourseStudioPage {
 		// elementUtils.fillValue(moduleDurationField, duration);
 	}
 
-	public void clickEditCourse(String courseName) {
+	public void clickEditForCourse(String courseName) {
+
 		wait.until(ExpectedConditions.visibilityOfAllElements(courseRows));
 
 		for (int i = 0; i < courseRows.size(); i++) {
-			if (courseRows.get(i).getText().contains(courseName)) {
-				wait.until(ExpectedConditions.elementToBeClickable(editCourseButtons.get(i))).click();
-				return;
+
+			try {
+				if (courseRows.get(i).getText().contains(courseName)) {
+
+					wait.until(ExpectedConditions.elementToBeClickable(editCourseButtons.get(i)));
+
+					elementUtils.click(editCourseButtons.get(i));
+					return;
+				}
+			} catch (StaleElementReferenceException e) {
+				throw new RuntimeException("Course table refreshed. Please locate the course again: " + courseName, e);
 			}
 		}
 
@@ -269,8 +294,6 @@ public class CourseStudioPage {
 		elementUtils.fillValue(courseOverview, overview);
 		elementUtils.fillValue(moduleTitle, updatedModuleTitle);
 
-		// Add module description and duration only after
-		// confirming their actual editable input locators.
 	}
 
 	public void saveCourseChanges() {
@@ -291,21 +314,99 @@ public class CourseStudioPage {
 	}
 
 	public void deleteCourse(String courseName) {
-		wait.until(ExpectedConditions.visibilityOfAllElements(courseRows));
 
-		for (int i = 0; i < courseRows.size(); i++) {
-			if (courseRows.get(i).getText().contains(courseName)) {
-				elementUtils.click(deleteCourseButtons.get(i));
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
 
-				wait.until(ExpectedConditions.elementToBeClickable(confirmDeleteButton));
+		boolean deleted = false;
 
-				elementUtils.click(confirmDeleteButton);
-				wait.until(ExpectedConditions.invisibilityOf(courseRows.get(i)));
-				return;
+		for (int attempt = 0; attempt < 3 && !deleted; attempt++) {
+
+			try {
+				wait.until(ExpectedConditions.visibilityOfAllElements(courseRows));
+
+				for (int i = 0; i < courseRows.size(); i++) {
+
+					if (courseRows.get(i).getText().contains(courseName)) {
+
+						wait.until(ExpectedConditions.elementToBeClickable(deleteCourseButtons.get(i)));
+
+						elementUtils.click(deleteCourseButtons.get(i));
+
+						wait.until(ExpectedConditions.elementToBeClickable(confirmDeleteButton));
+
+						elementUtils.click(confirmDeleteButton);
+
+						wait.until(ExpectedConditions.stalenessOf(courseRows.get(i)));
+
+						deleted = true;
+						break;
+					}
+				}
+
+				if (!deleted) {
+					throw new RuntimeException("Course not found: " + courseName);
+				}
+
+			} catch (StaleElementReferenceException e) {
+				if (attempt == 2) {
+					throw new RuntimeException("Course table kept refreshing during deletion: " + courseName, e);
+				}
 			}
 		}
 
-		throw new RuntimeException("Course not found: " + courseName);
+		System.out.println("Course deleted successfully: " + courseName);
+	}
+
+	public String getCourseStatus(String courseName) {
+
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+
+		wait.until(ExpectedConditions.visibilityOfAllElements(courseRows));
+		wait.until(ExpectedConditions.visibilityOfAllElements(courseNameElements));
+		wait.until(ExpectedConditions.visibilityOfAllElements(courseStatusElements));
+
+		int rowCount = courseRows.size();
+		int nameCount = courseNameElements.size();
+		int statusCount = courseStatusElements.size();
+
+		System.out.println("Rows: " + rowCount);
+		System.out.println("Course names: " + nameCount);
+		System.out.println("Status elements: " + statusCount);
+
+		if (rowCount != nameCount || rowCount != statusCount) {
+			throw new RuntimeException("Course table elements do not match. Check @FindBy locators.");
+		}
+
+		String searchName = courseName.trim().replaceAll("\\s+", " ");
+
+		for (int i = 0; i < rowCount; i++) {
+
+			String actualName = courseNameElements.get(i).getText().trim().replaceAll("\\s+", " ");
+
+			String actualStatus = courseStatusElements.get(i).getText().trim();
+
+			System.out.println("Table Row " + (i + 1) + " | Course Name: [" + actualName + "]" + " | Actual Status: ["
+					+ actualStatus + "]");
+
+			if (actualName.toLowerCase().contains(searchName.toLowerCase())) {
+
+				WebElement row = courseRows.get(i);
+
+				((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", row);
+
+				System.out.println("Course Number: " + (i + 1));
+				System.out.println("Course Name: " + actualName);
+				System.out.println("Actual Course Status: " + actualStatus);
+
+				if (actualStatus.isEmpty()) {
+					throw new RuntimeException("Status is empty for course: " + actualName);
+				}
+
+				return actualStatus;
+			}
+		}
+
+		throw new RuntimeException("Course not found: [" + searchName + "]. Check the course names printed above.");
 	}
 
 }
