@@ -52,7 +52,7 @@ public class BatchesAttendancePage {
 
 	@FindBy(xpath = "//input[@id='cohort-seat-capacity']")
 	private WebElement seatCapacity;
-	
+
 	@FindBy(xpath = "//*[normalize-space()='Selenium Automation Testing']")
 	private WebElement createdBatchNames;
 
@@ -217,4 +217,13 @@ public class BatchesAttendancePage {
 		throw new RuntimeException("No batch name found in the table");
 	}
 
+	public int getBatchTableCount() {
+
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+
+		wait.until(ExpectedConditions.visibilityOfAllElements(batchRows));
+
+		return batchRows.size();
+
+	}
 }

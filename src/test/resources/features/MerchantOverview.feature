@@ -7,9 +7,7 @@ Given user is logged into Merchant Studio Overview
 Then Overview dashboard should be displayed
 And Total Revenue value should be displayed
 And Confirmed Paid Learners count should be displayed
-And Published Courses count should be displayed
-And Courses In Review count should be displayed
-And Cohort Batches with Attendance Tracking count should be displayed
+Then course and batch table counts should match overview
 And My Institute status should be displayed
 And Accreditation status should be displayed
 And logged-in institute should match expected institute

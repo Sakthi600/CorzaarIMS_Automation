@@ -409,4 +409,25 @@ public class CourseStudioPage {
 		throw new RuntimeException("Course not found: [" + searchName + "]. Check the course names printed above.");
 	}
 
+	public int getCourseCountByStatus(String expectedStatus) {
+
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+
+		wait.until(d -> !courseRows.isEmpty());
+
+		int count = 0;
+
+		for (int i = 0; i < courseRows.size(); i++) {
+
+			String actualStatus = courseStatusElements.get(i).getText().trim().replace("_", " ").replaceAll("\\s+",
+					" ");
+
+			if (actualStatus.equalsIgnoreCase(expectedStatus.replace("_", " ").trim())) {
+				count++;
+			}
+		}
+
+		return count;
+	}
+
 }

@@ -1,6 +1,7 @@
 package pages;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,9 +32,9 @@ public class OverviewPage {
 	@FindBy(xpath = "(//span[normalize-space()='Overview'])[1]")
 	private WebElement overviewHeading;
 
+	@FindBy(xpath = "//span[text()='Overview']")
+	private WebElement overview;
 	
-	@FindBy(xpath = "(//span[normalize-space()='Total Revenue'])[1]")
-	private WebElement totalRevenueLabel;
 	@FindBy(xpath = "//*[normalize-space()='Published Courses']/following::span[1]")
 	private WebElement publishedCoursesLabel;
 
@@ -64,12 +65,14 @@ public class OverviewPage {
 	@FindBy(xpath = "(//h1[normalize-space()='My Institute'])[1]")
 	private WebElement myInstituteHeading;
 
-
 	@FindBy(xpath = "(//span[normalize-space()='Create Course'])[1]")
 	private WebElement createCourseButton;
 
 	@FindBy(xpath = "(//span[normalize-space()='Add Batch'])[1]")
 	private WebElement addBatchButton;
+	
+	@FindBy(xpath = "//table//tbody/tr")
+	private List<WebElement> studentEnrollRows;
 
 	
 	private String getVisibleText(WebElement element) {
@@ -146,9 +149,23 @@ public class OverviewPage {
 	public boolean isAddBatchDisplayed() {
 		return wait.until(ExpectedConditions.visibilityOf(addBatchButton)).isDisplayed();
 	}
+	
+	public int getStudentEnrollmentsTableCount() {
+
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+
+		wait.until(ExpectedConditions.visibilityOfAllElements(studentEnrollRows));
+
+		return studentEnrollRows.size();
+
+	} 
 
 	public void clickCreateCourse() {
 		elementUtils.click(createCourseButton);
+	}
+	
+	public void openOverview() {
+		elementUtils.click(overview);
 	}
 
 	public void clickAddBatch() {
