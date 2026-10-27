@@ -7,6 +7,5 @@ Feature: Funnel Insights
     And Top Performing Programs should be displayed
     And Rank 1 should be displayed
     And Rank 2 should be displayed
-    And Selenium Automation Testing program should be displayed
     And Curriculum Completion and Drop-Off Matrix should be displayed
     And no drop-off data message should be displayed

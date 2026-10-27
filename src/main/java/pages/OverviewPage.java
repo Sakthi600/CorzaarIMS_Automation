@@ -28,13 +28,12 @@ public class OverviewPage {
 		PageFactory.initElements(driver, this);
 	}
 
-	
 	@FindBy(xpath = "(//span[normalize-space()='Overview'])[1]")
 	private WebElement overviewHeading;
 
 	@FindBy(xpath = "//span[text()='Overview']")
 	private WebElement overview;
-	
+
 	@FindBy(xpath = "//*[normalize-space()='Published Courses']/following::span[1]")
 	private WebElement publishedCoursesLabel;
 
@@ -49,19 +48,19 @@ public class OverviewPage {
 
 	@FindBy(xpath = "(//span[normalize-space()='Total Revenue'])[1]")
 	private WebElement totalRevenueCard;
-	
+
 	@FindBy(xpath = "(//p[@class='text-xs sm:text-sm text-ink-muted dark:text-dark-ink-muted mt-1'])[1]")
 	private WebElement accreditationPending;
-	
+
 	@FindBy(xpath = "(//h1[normalize-space()='My Institute'])[1]")
 	private WebElement instituteName;
-	
+
 	@FindBy(xpath = "(//h1[normalize-space()='Course Studio'])[1]")
 	private WebElement courseStudioHeading;
-	
+
 	@FindBy(xpath = "(//h1[normalize-space()='Batches & Attendance'])[1]")
 	private WebElement batchesAttendanceHeading;
-	
+
 	@FindBy(xpath = "(//h1[normalize-space()='My Institute'])[1]")
 	private WebElement myInstituteHeading;
 
@@ -70,11 +69,19 @@ public class OverviewPage {
 
 	@FindBy(xpath = "(//span[normalize-space()='Add Batch'])[1]")
 	private WebElement addBatchButton;
-	
+
 	@FindBy(xpath = "//table//tbody/tr")
 	private List<WebElement> studentEnrollRows;
 
-	
+	@FindBy(xpath = "(//h3[normalize-space()='Course Studio'])[1]")
+	private WebElement courseStudioCard;
+
+	@FindBy(xpath = "(//h3[normalize-space()='Batches & Attendance Matrix'])[1]")
+	private WebElement batchesAttendanceCard;
+
+	@FindBy(xpath = "(//h3[normalize-space()='Learner Drop-off & Funnel'])[1]")
+	private WebElement learnerDropOffCard;
+
 	private String getVisibleText(WebElement element) {
 		return wait.until(ExpectedConditions.visibilityOf(element)).getText().trim();
 	}
@@ -89,7 +96,6 @@ public class OverviewPage {
 		throw new AssertionError("Number not found in UI text: " + text);
 	}
 
-	
 	public boolean isTotalRevenueDisplayed() {
 		return wait.until(ExpectedConditions.visibilityOf(totalRevenueCard)).isDisplayed();
 	}
@@ -124,9 +130,9 @@ public class OverviewPage {
 
 	public int getStudentEnrollmentsCount() {
 		String text = wait.until(ExpectedConditions.visibilityOf(studentEnrollmentsValue)).getText().trim();
-		
+
 		System.out.println("Student Enrollments value: " + text);
-		
+
 		return extractFirstNumber(text);
 	}
 
@@ -149,7 +155,7 @@ public class OverviewPage {
 	public boolean isAddBatchDisplayed() {
 		return wait.until(ExpectedConditions.visibilityOf(addBatchButton)).isDisplayed();
 	}
-	
+
 	public int getStudentEnrollmentsTableCount() {
 
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
@@ -158,12 +164,24 @@ public class OverviewPage {
 
 		return studentEnrollRows.size();
 
-	} 
+	}
+
+	public void clickCourseStudioCard() {
+		elementUtils.click(courseStudioCard);
+	}
+
+	public void clickBatchesAttendanceCard() {
+		elementUtils.click(batchesAttendanceCard);
+	}
+
+	public void clickLearnerDropOffCard() {
+		elementUtils.click(learnerDropOffCard);
+	}
 
 	public void clickCreateCourse() {
 		elementUtils.click(createCourseButton);
 	}
-	
+
 	public void openOverview() {
 		elementUtils.click(overview);
 	}

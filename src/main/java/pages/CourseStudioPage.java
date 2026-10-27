@@ -38,6 +38,9 @@ public class CourseStudioPage {
 	@FindBy(xpath = "//span[text()='New Course Program']")
 	private WebElement createCourseButton;
 
+	@FindBy(xpath = "(//h1[normalize-space()='Course Studio'])[1]")
+	private WebElement courseStudioHeading;
+
 	@FindBy(xpath = "//input[@id='course-title']")
 	private WebElement courseTitle;
 
@@ -79,10 +82,6 @@ public class CourseStudioPage {
 
 	@FindBy(xpath = "//span[text()='Publish Course']")
 	private WebElement publishCourseButton;
-
-	@FindBy(xpath = "//*[contains(normalize-space(),'under_review')]"
-			+ " | //*[contains(normalize-space(),'Under Review')]" + " | //*[contains(normalize-space(),'In Review')]")
-	private WebElement courseUnderReviewStatus;
 
 	@FindBy(xpath = "//button[@title='Edit Course']")
 	private List<WebElement> editCourseButtons;
@@ -153,11 +152,6 @@ public class CourseStudioPage {
 
 	public void clickCancel() {
 		elementUtils.click(cancelButton);
-	}
-
-	public boolean isCourseUnderReview() {
-
-		return elementUtils.isDisplayed(courseUnderReviewStatus);
 	}
 
 	public void clickAddModule() {
@@ -428,6 +422,11 @@ public class CourseStudioPage {
 		}
 
 		return count;
+	}
+
+	public boolean isCourseStudioPageDisplayed() {
+		return new WebDriverWait(driver, Duration.ofSeconds(20))
+				.until(ExpectedConditions.visibilityOf(courseStudioHeading)).isDisplayed();
 	}
 
 }

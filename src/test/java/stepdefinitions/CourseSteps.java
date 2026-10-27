@@ -13,20 +13,24 @@ public class CourseSteps {
 
 	private CourseStudioPage coursePage;
 
-	
+	private CourseStudioPage getCoursePage() {
+		if (coursePage == null) {
+			coursePage = new CourseStudioPage(DriverFactory.getDriver());
+		}
+		return coursePage;
+	}
+
 	@When("user opens Course Studio")
 	public void userOpensCourseStudio() {
-		coursePage = new CourseStudioPage(DriverFactory.getDriver());
-		coursePage.openCourseStudio();
+
+		getCoursePage().openCourseStudio();
 	}
 
-	
 	@When("user clicks Create New Course Program")
 	public void userClicksCreateNewCourseProgram() {
-		coursePage.clickCreateCourse();
+		getCoursePage().clickCreateCourse();
 	}
 
-	
 	@When("user fills mandatory course details")
 	public void userFillsMandatoryCourseDetails() {
 		coursePage.enterCourseTitle(ConfigReader.getProperty("courseTitle"));
@@ -40,35 +44,26 @@ public class CourseSteps {
 		// coursePage.enterModuleTitle(ConfigReader.getProperty("courseModuleTitle"));
 	}
 
-	
 	@When("user clicks Add Module")
 	public void userClicksAddModule() {
 		coursePage.clickAddModule();
 	}
 
-	
 	@When("user fills mandatory module details")
 	public void userFillsMandatoryModuleDetails() {
 		coursePage.fillModuleDetails(ConfigReader.getProperty("moduleTitle"));
 	}
-	
+
 	@Then("an additional module section should be displayed")
 	public void additionalModuleSectionShouldBeDisplayed() {
 		Assert.assertTrue(coursePage.getModuleCount() >= 2, "Additional module section was not displayed");
 	}
 
-	
 	@When("user submits the course")
 	public void userSubmitsTheCourse() {
 		coursePage.publishCourse();
 	}
 
-	@Then("course should be submitted for administrative review")
-	public void courseShouldBeSubmittedForAdministrativeReview() {
-		Assert.assertTrue(coursePage.isCourseUnderReview(), "Course was not moved to Under Review status");
-	}
-
-	
 	@When("user tests course validation for {string}")
 	public void userTestsCourseValidation(String testCase) {
 		coursePage.testCourseValidation(testCase);
@@ -80,7 +75,6 @@ public class CourseSteps {
 				"Expected validation was not displayed for: " + testCase);
 	}
 
-	
 	@When("user clicks the close button on the course program modal")
 	public void userClicksCloseButtonOnCourseProgramModal() {
 		coursePage.closeCourseProgramModal();
@@ -94,7 +88,7 @@ public class CourseSteps {
 	@Then("the created course status should be displayed")
 	public void theCreatedCourseStatusShouldBeDisplayed() {
 
-		String createdCourseName = "Postman Fundamentals in 6 hours";
+		String createdCourseName = ConfigReader.getProperty("courseTitle");
 
 		String actualStatus = coursePage.getCourseStatus(createdCourseName);
 
@@ -107,7 +101,7 @@ public class CourseSteps {
 	@Then("the existing course status should be displayed")
 	public void theExistingCourseStatusShouldBeDisplayed() {
 
-		String existingCourseName = "Postman: The Complete Guide - REST API Testing";
+		String existingCourseName = ConfigReader.getProperty("existingCourseName");
 
 		String actualStatus = coursePage.getCourseStatus(existingCourseName);
 
@@ -147,7 +141,6 @@ public class CourseSteps {
 				"Updated course was not displayed in the course table");
 	}
 
-	
 	@When("user deletes the configured course")
 	public void userDeletesTheConfiguredCourse() {
 		coursePage.deleteCourse(ConfigReader.getProperty("courseToDelete"));

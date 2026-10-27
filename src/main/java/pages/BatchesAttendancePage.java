@@ -1,9 +1,11 @@
 package pages;
 
 import java.time.Duration;
+
 import java.util.List;
 
-import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -34,6 +36,9 @@ public class BatchesAttendancePage {
 
 	@FindBy(xpath = "//span[normalize-space()='Create Cohort Batch']")
 	private WebElement createCohortBatchButton;
+
+	@FindBy(xpath = "(//h1[normalize-space()='Batches & Attendance'])[1]")
+	private WebElement batchesAttendanceHeading;
 
 	@FindBy(xpath = "//select[@id='select-course']")
 	private WebElement selectCourseDropdown;
@@ -74,10 +79,6 @@ public class BatchesAttendancePage {
 	@FindBy(xpath = "(//button[@aria-label='Close modal'])[1]")
 	private WebElement rosterMatrixCloseButton;
 
-	@FindBy(xpath = "//*[contains(normalize-space(),'Scheduled')]" + " | //*[contains(normalize-space(),'Cohort')]"
-			+ " | //*[contains(normalize-space(),'Mon')]")
-	private WebElement batchResult;
-
 	@FindBy(xpath = "//table//tbody/tr")
 	private List<WebElement> batchRows;
 
@@ -92,6 +93,10 @@ public class BatchesAttendancePage {
 	public void clickCreateCohortBatch() {
 
 		elementUtils.click(createCohortBatchButton);
+	}
+
+	public void refreshBatchPage() {
+		elementUtils.refreshPage();
 	}
 
 	public void selectCourse(int index) {
@@ -144,11 +149,6 @@ public class BatchesAttendancePage {
 		elementUtils.click(cancelButton);
 	}
 
-	public boolean isBatchCreated() {
-
-		return elementUtils.isDisplayed(batchResult);
-	}
-
 	public boolean isCreatedBatchDisplayed() {
 		return createdBatchName.isDisplayed();
 	}
@@ -179,23 +179,35 @@ public class BatchesAttendancePage {
 
 	public boolean isBatchDisplayed(String batchName) {
 
-		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-
-		wait.until(ExpectedConditions.visibilityOfAllElements(batchRows));
-
-		for (WebElement row : batchRows) {
-
-			String rowText = row.getText().trim();
-			System.out.println("Table Row: " + rowText);
-
-			if (rowText.toLowerCase().contains(batchName.trim().toLowerCase())) {
-				System.out.println("Matched Batch: " + rowText);
-				return true;
-			}
+		if (batchName == null || batchName.trim().isEmpty()) {
+			throw new IllegalArgumentException("Batch name is empty");
 		}
 
-		System.out.println("Batch not found: " + batchName);
-		return false;
+		elementUtils.refreshPage();
+
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+
+		try {
+			return wait.until(d -> {
+				for (WebElement row : batchRows) {
+					try {
+						String rowText = row.getText().trim();
+
+						System.out.println("Actual batch row: " + rowText);
+
+						if (rowText.toLowerCase().contains(batchName.trim().toLowerCase())) {
+							return true;
+						}
+					} catch (StaleElementReferenceException e) {
+						return false;
+					}
+				}
+				return false;
+			});
+		} catch (TimeoutException e) {
+			System.out.println("Batch not found: " + batchName);
+			return false;
+		}
 	}
 
 	public String getCreatedBatchName() {
@@ -226,4 +238,10 @@ public class BatchesAttendancePage {
 		return batchRows.size();
 
 	}
+
+	public boolean isBatchesAttendancePageDisplayed() {
+		return new WebDriverWait(driver, Duration.ofSeconds(20))
+				.until(ExpectedConditions.visibilityOf(batchesAttendanceHeading)).isDisplayed();
+	}
+
 }

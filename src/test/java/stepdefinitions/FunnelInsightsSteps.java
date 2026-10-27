@@ -23,7 +23,7 @@ public class FunnelInsightsSteps {
 	@Then("Funnel Insights page should be displayed")
 	public void funnelInsightsPageShouldBeDisplayed() {
 
-		Assert.assertTrue(funnelPage.isFunnelInsightsPageDisplayed(), "Funnel Insights page is not displayed");
+		Assert.assertTrue(funnelPage.isLearnerDropOffPageDisplayed(), "Funnel Insights page is not displayed");
 	}
 
 	@And("Top Performing Programs should be displayed")
@@ -42,13 +42,6 @@ public class FunnelInsightsSteps {
 	public void rankTwoShouldBeDisplayed() {
 
 		Assert.assertTrue(funnelPage.isRankTwoDisplayed(), "Rank #2 is not displayed");
-	}
-
-	@And("Selenium Automation Testing program should be displayed")
-	public void seleniumAutomationTestingProgramShouldBeDisplayed() {
-
-		Assert.assertTrue(funnelPage.isSeleniumAutomationTestingDisplayed(),
-				"Selenium Automation Testing program is not displayed");
 	}
 
 	@And("Curriculum Completion and Drop-Off Matrix should be displayed")

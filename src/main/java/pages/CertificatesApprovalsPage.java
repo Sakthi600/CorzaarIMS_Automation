@@ -39,7 +39,7 @@ public class CertificatesApprovalsPage {
 	@FindBy(xpath = "//*[normalize-space()='Templates Studio']")
 	private WebElement templatesStudio;
 
-	@FindBy(xpath = "//*[normalize-space()='LEARNER & PROGRAM']" + " | //*[normalize-space()='Learner & Program']")
+	@FindBy(xpath = "//*[normalize-space()='Learner & Program']")
 	private WebElement learnerProgram;
 
 	@FindBy(xpath = "//th[normalize-space()='Certificate ID']")

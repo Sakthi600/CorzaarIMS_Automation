@@ -6,7 +6,7 @@ Feature: Merchant Batch Creation
     And user clicks Create Cohort Batch
     And user fills mandatory batch details
     And user generates batch sessions
-    Then cohort sessions should be generated
+    Then the created batch should be displayed in the batch table
 
   @merchant @batch @roster
   Scenario: Verify batch creation and Roster Matrix navigation

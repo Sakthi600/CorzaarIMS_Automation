@@ -104,4 +104,7 @@ public class ElementUtils {
 
 		wait.until(ExpectedConditions.elementToBeClickable(element));
 	}
+	public void refreshPage() {
+		driver.navigate().refresh();
+	}
 }

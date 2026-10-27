@@ -7,6 +7,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import pages.BatchesAttendancePage;
 import pages.CourseStudioPage;
+import pages.FunnelInsightsPage;
 import pages.OverviewPage;
 import utils.DriverFactory;
 
@@ -14,6 +15,7 @@ public class OverviewSteps {
 	private final CourseStudioPage coursePage = new CourseStudioPage(DriverFactory.getDriver());
 	private final BatchesAttendancePage batchPage = new BatchesAttendancePage(DriverFactory.getDriver());
 	private final OverviewPage overviewPage = new OverviewPage(DriverFactory.getDriver());
+	private final FunnelInsightsPage funnelPage = new FunnelInsightsPage(DriverFactory.getDriver());
 
 	@Given("user is logged into Merchant Studio Overview")
 	public void userIsLoggedIntoMerchantStudioOverview() {
@@ -39,7 +41,7 @@ public class OverviewSteps {
 		Assert.assertTrue(count >= 0, "Invalid Confirmed Paid Learners count: " + count);
 
 		System.out.println("Confirmed Paid Learners: " + count);
-		
+
 //		overviewPage.openOverview();
 //
 //		int tableStudentEnrollCount = overviewPage.getStudentEnrollmentsTableCount();
@@ -48,12 +50,12 @@ public class OverviewSteps {
 //		int overviewStudentErollCount = overviewPage.getStudentEnrollmentsCount();
 //
 //		System.out.println("===== BATCH COUNT COMPARISON =====");
-//		System.out.println("Batch Table Count: " + tableStudentEnrollCount);
-//		System.out.println("Overview Batch Count: " + overviewStudentErollCount);
+//		System.out.println("StudentEnroll Table Count: " + tableStudentEnrollCount);
+//		System.out.println("Overview StudentEnroll Count: " + overviewStudentErollCount);
 //
 //		Assert.assertEquals(overviewStudentErollCount, tableStudentEnrollCount,
-//				"Batch count mismatch between Batch Table and Overview");
-		
+//				"StudentEnroll count mismatch between StudentEnroll Table and Overview");
+
 	}
 
 	@Then("course and batch table counts should match overview")
@@ -143,4 +145,35 @@ public class OverviewSteps {
 
 		Assert.assertTrue(overviewPage.isBatchesAttendancePageDisplayed(), "Batches & Attendance page was not opened");
 	}
+
+	@When("user clicks Course Studio card")
+	public void userClicksCourseStudioCard() {
+		overviewPage.clickCourseStudioCard();
+	}
+
+	@Then("Course Studio page should be displayed")
+	public void courseStudioPageShouldBeDisplayed() {
+		Assert.assertTrue(coursePage.isCourseStudioPageDisplayed(), "Course Studio navigation failed");
+	}
+
+	@When("user clicks Batches Attendance card")
+	public void userClicksBatchesAttendanceCard() {
+		overviewPage.clickBatchesAttendanceCard();
+	}
+
+	@Then("Batches Attendance page should be displayed")
+	public void batchesAttendancePageShouldBeDisplayed() {
+		Assert.assertTrue(batchPage.isBatchesAttendancePageDisplayed(), "Batches & Attendance navigation failed");
+	}
+
+	@When("user clicks Learner Drop-off card")
+	public void userClicksLearnerDropOffCard() {
+		overviewPage.clickLearnerDropOffCard();
+	}
+
+	@Then("Learner Drop-off page should be displayed")
+	public void learnerDropOffPageShouldBeDisplayed() {
+		Assert.assertTrue(funnelPage.isLearnerDropOffPageDisplayed(), "Learner Drop-off navigation failed");
+	}
+
 }

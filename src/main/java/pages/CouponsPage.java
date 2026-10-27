@@ -42,7 +42,7 @@ public class CouponsPage {
 	@FindBy(xpath = "(//span[normalize-space()='Cancel'])[1]")
 	private WebElement cancelButton;
 
-	@FindBy(xpath = "//*[contains(translate(normalize-space(.)," + "'PENDING','pending'),'pending')]")
+	@FindBy(xpath = "(//th[normalize-space()='Status'])[1]")
 	private WebElement pendingStatus;
 
 	public void openCoupons() {

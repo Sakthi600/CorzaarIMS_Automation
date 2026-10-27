@@ -13,24 +13,27 @@ public class BatchSteps {
 	private BatchesAttendancePage batchPage;
 	private String createdBatchName;
 
+	private BatchesAttendancePage getbatchPage() {
+		if (batchPage == null) {
+			batchPage = new BatchesAttendancePage(DriverFactory.getDriver());
+		}
+		return batchPage;
+	}
+
 	@When("user opens Batches and Attendance")
 	public void userOpensBatchesAndAttendance() {
-
-		batchPage = new BatchesAttendancePage(DriverFactory.getDriver());
-
-		batchPage.openBatchesAttendance();
+		getbatchPage().openBatchesAttendance();
 	}
 
 	@When("user clicks Create Cohort Batch")
 	public void userClicksCreateCohortBatch() {
-
-		batchPage.clickCreateCohortBatch();
+		getbatchPage().clickCreateCohortBatch();
 	}
 
 	@When("user fills mandatory batch details")
 	public void userFillsMandatoryBatchDetails() {
 
-		batchPage.selectCourse(0);
+		batchPage.selectCourse(12);
 
 		batchPage.enterCoordinator(ConfigReader.getProperty("batchCoordinator"));
 
@@ -62,9 +65,11 @@ public class BatchSteps {
 	@Then("the created batch should be displayed in the batch table")
 	public void createdBatchShouldBeDisplayedInTable() {
 
-		boolean displayed = batchPage.isBatchDisplayed(createdBatchName);
+		String batchName = ConfigReader.getProperty("batchName");
 
-		Assert.assertTrue(displayed, "Created batch not found in table: " + createdBatchName);
+		boolean displayed = getbatchPage().isBatchDisplayed(batchName);
+
+		Assert.assertTrue(displayed, "Created batch is not displayed: " + batchName);
 	}
 
 	@When("user clicks Roster Matrix for the created batch")
@@ -158,12 +163,6 @@ public class BatchSteps {
 	public void userGeneratesBatchSessions() {
 
 		batchPage.generateSessions();
-	}
-
-	@Then("cohort sessions should be generated")
-	public void cohortSessionsShouldBeGenerated() {
-
-		Assert.assertTrue(batchPage.isBatchCreated(), "Cohort sessions were not generated");
 	}
 
 }

@@ -34,7 +34,7 @@ Feature: Merchant Course Authoring
   @merchant @course @update
   Scenario: Update all course fields
     When user opens Course Studio
-    And user clicks Edit for the course "Microsoft Playwright Courses"
+    And user clicks Edit for the course "Data Science"
     And user edits all course fields
     And user saves the course changes
     Then the updated course should be displayed in the course table

@@ -1,9 +1,13 @@
 package pages;
 
+import java.time.Duration;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import utils.ElementUtils;
 
@@ -33,9 +37,6 @@ public class FunnelInsightsPage {
 	@FindBy(xpath = "//span[normalize-space()='Rank #2']")
 	private WebElement rankTwo;
 
-	@FindBy(xpath = "(//h3[text()='Selenium Automation Testing'])[1]")
-	private WebElement seleniumAutomationTesting;
-
 	@FindBy(xpath = "//*[normalize-space()='Curriculum Completion & Drop-Off Matrix']")
 	private WebElement curriculumCompletion;
 
@@ -44,10 +45,6 @@ public class FunnelInsightsPage {
 
 	public void openFunnelInsights() {
 		elementUtils.click(funnelInsightsMenu);
-	}
-
-	public boolean isFunnelInsightsPageDisplayed() {
-		return elementUtils.isDisplayed(pageTitle);
 	}
 
 	public boolean isTopPerformingProgramsDisplayed() {
@@ -62,15 +59,16 @@ public class FunnelInsightsPage {
 		return elementUtils.isDisplayed(rankTwo);
 	}
 
-	public boolean isSeleniumAutomationTestingDisplayed() {
-		return elementUtils.isDisplayed(seleniumAutomationTesting);
-	}
-
 	public boolean isCurriculumCompletionDisplayed() {
 		return elementUtils.isDisplayed(curriculumCompletion);
 	}
 
 	public boolean isNoDropOffDataDisplayed() {
 		return elementUtils.isDisplayed(noDropOffData);
+	}
+
+	public boolean isLearnerDropOffPageDisplayed() {
+		return new WebDriverWait(driver, Duration.ofSeconds(20)).until(ExpectedConditions.visibilityOf(pageTitle))
+				.isDisplayed();
 	}
 }
